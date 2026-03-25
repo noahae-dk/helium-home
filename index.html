@@ -1,0 +1,4034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#05070a" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzMiwzMikiIGZpbGw9IndoaXRlIj4KICAgIDxwb2x5Z29uIHBvaW50cz0iLTIuOCwzIDIuOCwzIDQuNSwtMTcgMS44LC0yMyAtMS44LC0yMyAtNC41LC0xNyIgdHJhbnNmb3JtPSJyb3RhdGUoMCkiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLTIuOCwzIDIuOCwzIDQuNSwtMTcgMS44LC0yMyAtMS44LC0yMyAtNC41LC0xNyIgdHJhbnNmb3JtPSJyb3RhdGUoNjApIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ii0yLjgsMyAyLjgsMyA0LjUsLTE3IDEuOCwtMjMgLTEuOCwtMjMgLTQuNSwtMTciIHRyYW5zZm9ybT0icm90YXRlKDEyMCkiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLTIuOCwzIDIuOCwzIDQuNSwtMTcgMS44LC0yMyAtMS44LC0yMyAtNC41LC0xNyIgdHJhbnNmb3JtPSJyb3RhdGUoMTgwKSIvPgogICAgPHBvbHlnb24gcG9pbnRzPSItMi44LDMgMi44LDMgNC41LC0xNyAxLjgsLTIzIC0xLjgsLTIzIC00LjUsLTE3IiB0cmFuc2Zvcm09InJvdGF0ZSgyNDApIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ii0yLjgsMyAyLjgsMyA0LjUsLTE3IDEuOCwtMjMgLTEuOCwtMjMgLTQuNSwtMTciIHRyYW5zZm9ybT0icm90YXRlKDMwMCkiLz4KICA8L2c+Cjwvc3ZnPgo="/>
+  <title>Helium Start Page</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --accent-rgb: 104, 255, 191;
+      --accent-text-rgb: 194, 255, 227;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+      overflow: hidden;
+      background: #05070a;
+      color-scheme: dark;
+    }
+
+    body {
+      background-color: #ffffff;
+      background-image: none;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+      color: white;
+      touch-action: manipulation;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.06));
+      pointer-events: none;
+      transition: opacity 0.28s ease;
+    }
+
+    body.solid-background::before {
+      opacity: 0;
+    }
+
+    .overlay {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      padding: 24px;
+    }
+
+    .clock {
+      font-size: 2.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+            user-select: none;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .date {
+      font-size: 1.18rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+            user-select: none;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .weather-line {
+      transition:
+        opacity 0.28s ease,
+        filter 0.34s ease,
+        transform 0.34s cubic-bezier(.2, .8, .2, 1),
+        max-height 0.34s cubic-bezier(.2, .8, .2, 1),
+        margin-top 0.28s ease;
+      overflow: hidden;
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+      pointer-events: auto;
+      max-height: 28px;
+      font-size: 0.98rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+            user-select: none;
+      color: rgba(255, 255, 255, 0.84);
+      margin-top: 6px;
+      min-height: 1.25em;
+      max-width: min(360px, calc(100vw - 48px));
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .weather-line.is-hidden {
+      opacity: 0;
+      filter: blur(10px);
+      transform: translateY(-6px);
+      max-height: 0;
+      margin-top: 0;
+      pointer-events: none;
+    }
+
+        .ambient-particles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .ambient-particle {
+      position: absolute;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 35% 35%, rgba(255,255,255,0.58), rgba(255,255,255,0.20) 42%, transparent 74%);
+      opacity: 0;
+      filter: blur(0.38px);
+      box-shadow:
+        0 0 8px rgba(255,255,255,0.10),
+        0 0 18px rgba(255,255,255,0.06);
+      will-change: transform, opacity, filter;
+      animation:
+        sporeDrift var(--drift, 16s) linear infinite,
+        sporePulse var(--pulse, 6s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s), var(--pulse-delay, 0s);
+    }
+
+    .ambient-particle.is-green {
+      background:
+        radial-gradient(circle at 35% 35%, rgba(var(--accent-text-rgb), 0.50), rgba(var(--accent-rgb), 0.22) 46%, transparent 74%);
+      filter: blur(0.45px);
+      box-shadow:
+        0 0 10px rgba(var(--accent-rgb), 0.14),
+        0 0 22px rgba(var(--accent-rgb), 0.08);
+    }
+
+    body.solid-background:not(.dark-solid) .ambient-particle {
+      background:
+        radial-gradient(circle at 35% 35%, rgba(74,82,94,0.34), rgba(74,82,94,0.12) 42%, transparent 74%);
+      box-shadow:
+        0 0 8px rgba(74,82,94,0.08),
+        0 0 16px rgba(74,82,94,0.05);
+    }
+
+    body.solid-background:not(.dark-solid) .ambient-particle.is-green {
+      background:
+        radial-gradient(circle at 35% 35%, rgba(102, 232, 182, 0.42), rgba(74, 190, 144, 0.16) 46%, transparent 74%);
+      box-shadow:
+        0 0 10px rgba(74, 190, 144, 0.12),
+        0 0 22px rgba(74, 190, 144, 0.06);
+    }
+
+    @keyframes sporeDrift {
+      0% {
+        transform: translate3d(0, 0, 0) scale(0.92);
+        opacity: 0;
+      }
+      8% {
+        opacity: var(--opacity, 0.22);
+      }
+      45% {
+        opacity: calc(var(--opacity, 0.22) * 0.96);
+      }
+      100% {
+        transform: translate3d(var(--drift-x, 16px), var(--drift-y, -120px), 0) scale(1.12);
+        opacity: 0;
+      }
+    }
+
+    @keyframes sporePulse {
+      0%, 100% {
+        filter: blur(0.35px) brightness(1);
+      }
+      50% {
+        filter: blur(1px) brightness(1.12);
+      }
+    }
+
+.clock,
+    .date,
+    .weather-line,
+    .search-wrap {
+      position: relative;
+      z-index: 2;
+    }
+
+    .clock,
+    .date,
+    .weather-line {
+      color: rgba(255, 255, 255, 0.96);
+      text-shadow:
+        0 0 6px rgba(0, 0, 0, 0.45),
+        0 0 14px rgba(0, 0, 0, 0.28),
+        0 0 28px rgba(0, 0, 0, 0.16);
+      background: transparent;
+      box-shadow: none;
+      filter: none;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .weather-line {
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    body.solid-background:not(.dark-solid) .clock,
+    body.solid-background:not(.dark-solid) .date,
+    body.solid-background:not(.dark-solid) .weather-line {
+      color: rgba(46, 54, 64, 0.95);
+      text-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.62),
+        0 8px 20px rgba(0, 0, 0, 0.10),
+        0 18px 38px rgba(0, 0, 0, 0.06);
+      background: transparent;
+      box-shadow: none;
+      filter: none;
+    }
+
+    body.solid-background:not(.dark-solid) .weather-line {
+      color: rgba(60, 68, 78, 0.88);
+    }
+
+    body.solid-background.dark-solid .clock,
+    body.solid-background.dark-solid .date,
+    body.solid-background.dark-solid .weather-line {
+      color: rgba(255, 255, 255, 0.96);
+      text-shadow:
+        0 0 6px rgba(0, 0, 0, 0.52),
+        0 0 14px rgba(0, 0, 0, 0.36),
+        0 0 28px rgba(0, 0, 0, 0.22);
+      background: transparent;
+      box-shadow: none;
+      filter: none;
+    }
+
+    body.solid-background.dark-solid .weather-line {
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+
+    .search-wrap.has-result .suggestions {
+      top: calc(100% + 104px);
+    }
+
+    .quick-result-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .quick-result-copy {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.94);
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(2px) scale(0.98);
+      transition:
+        opacity 0.18s ease,
+        transform 0.18s ease,
+        background 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .quick-result.is-copyable .quick-result-copy {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .quick-result-copy:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .quick-result-copy:active,
+    .quick-result-copy.is-copied {
+      transform: translateY(0) scale(0.96);
+    }
+
+    .search-wrap {
+      width: min(820px, calc(100vw - 48px));
+      position: absolute;
+      top: 42%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .search-wrap.has-result .suggestions {
+      top: calc(100% + 96px);
+    }
+
+    .search-form {
+      display: flex;
+      align-items: center;
+      position: relative;
+      z-index: 30;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(10, 16, 24, 0.40);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 18px;
+      box-shadow: 0 12px 34px rgba(0, 0, 0, 0.24);
+      overflow: visible;
+      transition:
+        transform 0.34s cubic-bezier(.2, .8, .2, 1),
+        box-shadow 0.34s cubic-bezier(.2, .8, .2, 1),
+        background 0.34s cubic-bezier(.2, .8, .2, 1),
+        border-color 0.34s cubic-bezier(.2, .8, .2, 1),
+        filter 0.34s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .search-form::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background:
+        linear-gradient(
+          90deg,
+          transparent 0%,
+          transparent 16%,
+          rgba(255,255,255,0.045) 30%,
+          rgba(255,255,255,0.03) 42%,
+          transparent 58%,
+          transparent 78%,
+          rgba(255,255,255,0.02) 100%
+        ),
+        radial-gradient(
+          120% 100% at 38% 50%,
+          rgba(255,255,255,0.045) 0%,
+          transparent 42%
+        );
+      opacity: 0.72;
+      pointer-events: none;
+      transition: opacity 0.34s ease, transform 0.34s ease;
+    }
+
+    .search-form:hover {
+      transform: translateY(-3px) scale(1.012);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.30);
+      border-color: rgba(255, 255, 255, 0.22);
+      background: rgba(12, 18, 28, 0.48);
+      filter: saturate(1.05);
+    }
+
+    .search-form:hover::before {
+      opacity: 0.95;
+      transform: translateX(3px);
+    }
+
+    .search-form:focus-within {
+      transform: translateY(-4px) scale(1.016);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.34);
+      border-color: rgba(255, 255, 255, 0.28);
+      background: rgba(14, 20, 32, 0.54);
+    }
+
+    .search-form:focus-within::before {
+      opacity: 0.88;
+      transform: translateX(2px);
+    }
+
+    .search-form.mode-chatgpt {
+      background: rgba(9, 22, 18, 0.56);
+      border-color: rgba(104, 255, 191, 0.22);
+      box-shadow:
+        0 20px 48px rgba(0, 0, 0, 0.34),
+        0 0 0 1px rgba(104, 255, 191, 0.07) inset,
+        0 0 44px rgba(104, 255, 191, 0.06);
+    }
+
+    .search-form.mode-chatgpt::before {
+      background:
+        linear-gradient(
+          90deg,
+          transparent 0%,
+          transparent 22%,
+          rgba(104,255,191,0.05) 36%,
+          rgba(104,255,191,0.035) 48%,
+          transparent 64%,
+          transparent 82%,
+          rgba(104,255,191,0.025) 100%
+        ),
+        radial-gradient(
+          120% 100% at 44% 50%,
+          rgba(104,255,191,0.075) 0%,
+          transparent 42%
+        );
+    }
+
+    .search-form.mode-chatgpt:hover,
+    .search-form.mode-chatgpt:focus-within {
+      background: rgba(10, 24, 19, 0.62);
+      border-color: rgba(104, 255, 191, 0.30);
+      box-shadow:
+        0 22px 52px rgba(0, 0, 0, 0.36),
+        0 0 0 1px rgba(104, 255, 191, 0.10) inset,
+        0 0 58px rgba(104, 255, 191, 0.10);
+    }
+
+
+    .mode-sparkles {
+      position: absolute;
+      inset: -22px;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 45;
+    }
+
+    .mode-sparkle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
+      animation: modeSparkleBurst 760ms cubic-bezier(.2, .8, .2, 1) forwards;
+      filter: drop-shadow(0 0 10px rgba(var(--accent-rgb), 0.25));
+    }
+
+    .mode-sparkle::before,
+    .mode-sparkle::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 2px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(var(--accent-text-rgb), 0.95);
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18);
+    }
+
+    .mode-sparkle::after {
+      transform: translate(-50%, -50%) rotate(90deg);
+    }
+
+    .mode-sparkle.is-soft::before,
+    .mode-sparkle.is-soft::after {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    @keyframes modeSparkleBurst {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.35) rotate(0deg);
+      }
+      18% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.05) rotate(28deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--sparkle-x, 0px)), calc(-50% + var(--sparkle-y, 0px))) scale(0.72) rotate(70deg);
+      }
+    }
+
+    .search-form.is-mode-switching {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 22px 52px rgba(0, 0, 0, 0.34);
+      border-color: rgba(255, 255, 255, 0.24);
+    }
+
+    .search-form.mode-chatgpt.is-mode-switching {
+      border-color: rgba(var(--accent-rgb), 0.30);
+      box-shadow:
+        0 22px 52px rgba(0, 0, 0, 0.36),
+        0 0 0 1px rgba(var(--accent-rgb), 0.10) inset,
+        0 0 34px rgba(var(--accent-rgb), 0.10);
+    }
+
+    .search-form.is-mode-switching::before {
+      opacity: 0.98;
+      transform: translateX(8px) scale(1.03, 1.015);
+      filter: saturate(1.12);
+    }
+
+    .search-form.mode-chatgpt.is-mode-switching::before {
+      opacity: 1;
+      transform: translateX(10px) scale(1.035, 1.02);
+      filter: saturate(1.16);
+    }
+
+    .search-form.is-pressed {
+      transform: translateY(-2px) scale(1.008);
+    }
+
+    .search-form.is-pressed::before {
+      opacity: 0.92;
+      transform: translateX(6px) scale(1.01, 0.995);
+    }
+
+    .engine-picker {
+      position: relative;
+      flex-shrink: 0;
+      padding-right: 10px;
+      display: inline-flex;
+      transition: opacity 0.24s ease, transform 0.30s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .search-form.mode-chatgpt .engine-picker {
+      display: none;
+      opacity: 0;
+      transform: translateX(14px) scale(0.96);
+      pointer-events: none;
+    }
+
+    .engine-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      height: 50px;
+      width: 54px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      outline: none;
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      padding: 0 10px;
+      cursor: pointer;
+      border-radius: 999px;
+      overflow: hidden;
+      transition:
+        width 0.24s cubic-bezier(.2, .8, .2, 1),
+        padding 0.24s cubic-bezier(.2, .8, .2, 1),
+        gap 0.24s cubic-bezier(.2, .8, .2, 1),
+        background 0.22s ease,
+        border-color 0.22s ease,
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        opacity 0.22s ease;
+      justify-content: flex-start;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .engine-trigger:hover,
+    .engine-trigger.active {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.16);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .engine-trigger.active {
+      width: 132px;
+      padding: 0 14px 0 12px;
+      gap: 10px;
+    }
+
+    .engine-trigger:active { transform: scale(0.985); }
+
+    .engine-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .engine-label {
+      font-size: 0.95rem;
+      line-height: 1;
+      white-space: nowrap;
+      color: rgba(255, 255, 255, 0.95);
+      max-width: 0;
+      opacity: 0;
+      overflow: hidden;
+      transform: translateX(-6px);
+      transition:
+        max-width 0.22s cubic-bezier(.2, .8, .2, 1),
+        opacity 0.16s ease,
+        transform 0.22s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .engine-trigger.active .engine-label {
+      max-width: 90px;
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .engine-caret {
+      width: 8px;
+      height: 8px;
+      border-right: 1.5px solid rgba(255, 255, 255, 0.85);
+      border-bottom: 1.5px solid rgba(255, 255, 255, 0.85);
+      transform: rotate(45deg) translateY(-1px);
+      margin-left: auto;
+      opacity: 0.9;
+      flex-shrink: 0;
+      transition: transform 0.18s ease, opacity 0.18s ease;
+    }
+
+    .engine-trigger.active .engine-caret {
+      transform: rotate(225deg) translateY(-1px);
+    }
+
+    .engine-menu {
+      position: absolute;
+      top: calc(100% + 12px);
+      right: 10px;
+      width: 220px;
+      margin: 0;
+      padding: 8px;
+      list-style: none;
+      border-radius: 16px;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      background: rgba(10, 16, 24, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
+      display: none;
+      z-index: 40;
+    }
+
+    .engine-menu.visible {
+      display: block;
+      animation: pickerMenuIn 0.18s cubic-bezier(.2, .8, .2, 1);
+      transform-origin: top right;
+    }
+
+    .engine-menu.closing {
+      display: block;
+      animation: pickerMenuOut 0.16s cubic-bezier(.2, .8, .2, 1) forwards;
+      transform-origin: top right;
+      pointer-events: none;
+    }
+
+    .engine-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.16s ease, transform 0.16s ease;
+    }
+
+    .engine-option:hover,
+    .engine-option.active {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(2px);
+    }
+
+    .engine-option .engine-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .engine-option + .engine-option {
+      margin-top: 6px;
+    }
+
+    .quick-result {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 0;
+      width: 100%;
+      margin: 0;
+      padding: 14px 18px;
+      border-radius: 14px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: rgba(10, 16, 24, 0.58);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 16px 38px rgba(0, 0, 0, 0.28);
+      z-index: 22;
+      opacity: 0;
+      transform: translateY(8px) scale(0.985);
+      pointer-events: none;
+      transition:
+        opacity 0.22s ease,
+        transform 0.26s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .quick-result.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .quick-result-value {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.96);
+      word-break: break-word;
+    }
+
+    .mode-toast {
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 14px);
+      transform: translate(-50%, 8px) scale(0.96);
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(10, 16, 24, 0.64);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.88);
+      opacity: 0;
+      pointer-events: none;
+      transition:
+        opacity 0.28s ease,
+        transform 0.34s cubic-bezier(.2, .8, .2, 1),
+        border-color 0.28s ease,
+        background 0.28s ease,
+        box-shadow 0.28s ease;
+      z-index: 50;
+      white-space: nowrap;
+    }
+
+    .mode-toast.visible {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
+    }
+
+    .mode-toast.chatgpt {
+      background: rgba(8, 22, 18, 0.72);
+      border-color: rgba(104, 255, 191, 0.24);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28), 0 0 24px rgba(104, 255, 191, 0.08);
+      color: rgba(194, 255, 227, 0.94);
+    }
+
+    .suggestions {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 0;
+      width: 100%;
+      margin: 0;
+      padding: 8px;
+      list-style: none;
+      border-radius: 14px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: rgba(10, 16, 24, 0.52);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 16px 38px rgba(0, 0, 0, 0.28);
+      max-height: 280px;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      z-index: 20;
+      opacity: 0;
+      transform: translateY(8px) scale(0.985);
+      pointer-events: none;
+      transition:
+        opacity 0.22s ease,
+        transform 0.26s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .suggestions::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      display: none;
+    }
+
+    .suggestions.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .suggestion-item {
+      padding: 12px 14px;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      font-size: 1.03rem;
+      transition: background 0.16s ease, transform 0.16s ease;
+    }
+
+    .suggestion-item:hover,
+    .suggestion-item.active {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateX(2px);
+    }
+
+    .search-input {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: white;
+      font-size: 1.2rem;
+      padding: 20px 24px;
+      min-width: 0;
+      transition: color 0.24s ease, padding 0.30s cubic-bezier(.2, .8, .2, 1), font-size 0.24s ease;
+    }
+
+    .search-form.mode-chatgpt .search-input {
+      padding-left: 24px;
+      font-size: 1.18rem;
+      color: rgba(240, 255, 248, 0.98);
+    }
+
+    .search-input::placeholder {
+      color: rgba(255, 255, 255, 0.72);
+      transition: opacity 0.2s ease, color 0.24s ease;
+    }
+
+    .search-form.mode-chatgpt .search-input::placeholder {
+      color: rgba(194, 255, 227, 0.82);
+    }
+  
+    .ai-picker {
+      position: relative;
+      flex-shrink: 0;
+      padding-right: 10px;
+      display: none;
+      opacity: 0;
+      transform: translateX(14px) scale(0.96);
+      pointer-events: none;
+      transition: opacity 0.24s ease, transform 0.30s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .search-form.mode-chatgpt .ai-picker {
+      display: inline-flex;
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .ai-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      height: 50px;
+      width: 54px;
+      border: 1px solid rgba(104, 255, 191, 0.16);
+      outline: none;
+      background: rgba(104, 255, 191, 0.08);
+      color: white;
+      padding: 0 10px;
+      cursor: pointer;
+      border-radius: 999px;
+      overflow: hidden;
+      transition:
+        width 0.24s cubic-bezier(.2, .8, .2, 1),
+        padding 0.24s cubic-bezier(.2, .8, .2, 1),
+        gap 0.24s cubic-bezier(.2, .8, .2, 1),
+        background 0.22s ease,
+        border-color 0.22s ease,
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        opacity 0.22s ease;
+      justify-content: flex-start;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .ai-trigger:hover,
+    .ai-trigger.active {
+      background: rgba(104, 255, 191, 0.14);
+      border-color: rgba(104, 255, 191, 0.24);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .ai-trigger.active {
+      width: 138px;
+      padding: 0 14px 0 12px;
+      gap: 10px;
+    }
+
+    .ai-trigger:active {
+      transform: scale(0.985);
+    }
+
+    .ai-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .ai-label {
+      font-size: 0.95rem;
+      line-height: 1;
+      white-space: nowrap;
+      color: rgba(255, 255, 255, 0.95);
+      max-width: 0;
+      opacity: 0;
+      overflow: hidden;
+      transform: translateX(-6px);
+      transition:
+        max-width 0.22s cubic-bezier(.2, .8, .2, 1),
+        opacity 0.16s ease,
+        transform 0.22s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .ai-trigger.active .ai-label {
+      max-width: 96px;
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .ai-caret {
+      width: 8px;
+      height: 8px;
+      border-right: 1.5px solid rgba(255, 255, 255, 0.85);
+      border-bottom: 1.5px solid rgba(255, 255, 255, 0.85);
+      transform: rotate(45deg) translateY(-1px);
+      margin-left: auto;
+      opacity: 0.9;
+      flex-shrink: 0;
+      transition: transform 0.18s ease, opacity 0.18s ease;
+    }
+
+    .ai-trigger.active .ai-caret {
+      transform: rotate(225deg) translateY(-1px);
+    }
+
+    .ai-menu {
+      position: absolute;
+      top: calc(100% + 12px);
+      right: 10px;
+      width: 220px;
+      margin: 0;
+      padding: 8px;
+      list-style: none;
+      border-radius: 16px;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      background: rgba(10, 16, 24, 0.82);
+      border: 1px solid rgba(104, 255, 191, 0.14);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
+      display: none;
+      z-index: 40;
+    }
+
+    .ai-menu.visible {
+      display: block;
+      animation: pickerMenuIn 0.18s cubic-bezier(.2, .8, .2, 1);
+      transform-origin: top right;
+    }
+
+    .ai-menu.closing {
+      display: block;
+      animation: pickerMenuOut 0.16s cubic-bezier(.2, .8, .2, 1) forwards;
+      transform-origin: top right;
+      pointer-events: none;
+    }
+
+    .ai-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.16s ease, transform 0.16s ease;
+    }
+
+    .ai-option:hover,
+    .ai-option.active {
+      background: rgba(104, 255, 191, 0.10);
+      transform: translateX(2px);
+    }
+
+    .ai-option .ai-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .ai-option + .ai-option {
+      margin-top: 6px;
+    }
+
+  
+    .copy-toast {
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 58px);
+      transform: translate(-50%, 8px) scale(0.96);
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(10, 16, 24, 0.74);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.92);
+      opacity: 0;
+      pointer-events: none;
+      transition:
+        opacity 0.24s ease,
+        transform 0.28s cubic-bezier(.2, .8, .2, 1);
+      z-index: 55;
+      white-space: nowrap;
+    }
+
+    .copy-toast.visible {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
+    }
+
+  
+    @keyframes pickerFadeSlideIn {
+      0% {
+        opacity: 0;
+        transform: translateX(10px) scale(0.97);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+
+    @keyframes pickerMenuIn {
+      0% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.985);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes pickerMenuOut {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.985);
+      }
+    }
+
+    .search-form:not(.mode-chatgpt) .engine-trigger {
+      animation: pickerFadeSlideIn 0.26s cubic-bezier(.2, .8, .2, 1);
+      transform-origin: right center;
+    }
+
+    .search-form.mode-chatgpt .ai-trigger {
+      animation: pickerFadeSlideIn 0.26s cubic-bezier(.2, .8, .2, 1);
+      transform-origin: right center;
+    }
+
+    .search-form.switching-to-search .engine-trigger {
+      animation: pickerFadeSlideIn 0.28s cubic-bezier(.2, .8, .2, 1);
+      transform-origin: right center;
+    }
+
+    .search-form.switching-to-ai .ai-trigger {
+      animation: pickerFadeSlideIn 0.28s cubic-bezier(.2, .8, .2, 1);
+      transform-origin: right center;
+    }
+
+
+    .mode-toggle {
+      position: fixed;
+      right: 80px;
+      bottom: 22px;
+      z-index: 121;
+    }
+
+    .mode-toggle-btn {
+      width: 50px;
+      height: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      background: rgba(10, 16, 24, 0.52);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      transition:
+        transform 0.24s ease,
+        background 0.24s ease,
+        border-color 0.24s ease,
+        box-shadow 0.24s ease,
+        color 0.24s ease;
+    }
+
+    .mode-toggle-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.30);
+    }
+
+    .mode-toggle-btn.is-ai {
+      background: rgba(10, 16, 24, 0.52);
+      border-color: rgba(255, 255, 255, 0.16);
+      color: rgba(255,255,255,0.92);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+    }
+
+    .mode-toggle-btn.is-search {
+      background: rgba(var(--accent-rgb), 0.30);
+      border-color: rgba(var(--accent-rgb), 0.52);
+      color: rgba(var(--accent-text-rgb), 0.99);
+      box-shadow:
+        0 16px 34px rgba(0, 0, 0, 0.30),
+        0 0 34px rgba(var(--accent-rgb), 0.18),
+        0 0 0 1px rgba(var(--accent-rgb), 0.24) inset;
+      text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.22);
+    }
+
+    .mode-toggle-btn.is-switching {
+      transform: translateY(-2px) scale(1.08) rotate(8deg);
+    }
+
+    .mode-toggle-icon-wrap {
+      position: relative;
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mode-toggle-btn.is-search .mode-toggle-icon-wrap {
+      border-radius: 999px;
+      box-shadow:
+        0 0 0 1.5px rgba(var(--accent-rgb), 0.55),
+        0 0 14px rgba(var(--accent-rgb), 0.20);
+      background: rgba(var(--accent-rgb), 0.10);
+    }
+
+    .mode-toggle-btn.is-ai .mode-toggle-icon-wrap {
+      box-shadow: none;
+      background: transparent;
+    }
+
+
+    .mode-toggle-icon,
+    .mode-toggle-question {
+      position: absolute;
+      inset: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition:
+        opacity 0.22s ease,
+        transform 0.28s cubic-bezier(.2, .8, .2, 1),
+        filter 0.28s ease;
+    }
+
+    .mode-toggle-icon {
+      font-size: 20px;
+      line-height: 1;
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+      filter: blur(0);
+    }
+
+    .mode-toggle-question {
+      font-size: 18px;
+      font-weight: 700;
+      opacity: 0;
+      transform: scale(0.72) rotate(-16deg);
+      filter: blur(4px);
+    }
+
+    .mode-toggle-btn.is-ai .mode-toggle-icon {
+      opacity: 0;
+      transform: scale(0.72) rotate(16deg);
+      filter: blur(4px);
+    }
+
+    .mode-toggle-btn.is-ai .mode-toggle-question {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+      filter: blur(0);
+    }
+    .settings-switcher {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 120;
+    }
+
+    .settings-trigger {
+      width: 50px;
+      height: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      background: rgba(10, 16, 24, 0.52);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.22s ease, background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .settings-trigger:hover,
+    .settings-trigger.active {
+      transform: translateY(-2px);
+      background: rgba(14, 22, 34, 0.66);
+      border-color: rgba(var(--accent-rgb), 0.52);
+      box-shadow:
+        0 16px 34px rgba(0, 0, 0, 0.30),
+        0 0 34px rgba(var(--accent-rgb), 0.18),
+        0 0 0 1px rgba(var(--accent-rgb), 0.24) inset;
+      text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.22);
+    }
+
+    .settings-trigger.is-switching {
+      transform: translateY(-2px) scale(1.08) rotate(8deg);
+    }
+
+    .settings-trigger svg {
+      width: 18px;
+      height: 18px;
+      opacity: 0.92;
+    }
+
+    .settings-menu,
+    .settings-submenu {
+      position: absolute;
+      margin: 0;
+      padding: 8px;
+      list-style: none;
+      border-radius: 16px;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      background: rgba(10, 16, 24, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
+      opacity: 0;
+      transform: translateY(8px) scale(0.985);
+      pointer-events: none;
+      transition:
+        opacity 0.22s ease,
+        transform 0.26s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .settings-menu {
+      right: 0;
+      bottom: calc(100% + 12px);
+      width: 212px;
+    }
+
+    .settings-submenu {
+      right: 0;
+      bottom: var(--submenu-offset, calc(100% + 188px));
+      width: 170px;
+    }
+
+    .settings-menu.visible,
+    .settings-submenu.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+      animation: pickerMenuIn 0.18s cubic-bezier(.2, .8, .2, 1);
+      transform-origin: top right;
+    }
+
+    .settings-item,
+    .wallpaper-subitem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 13px;
+      border-radius: 12px;
+      color: rgba(255, 255, 255, 0.94);
+      cursor: pointer;
+      transition: background 0.16s ease, transform 0.16s ease;
+      font-size: 0.95rem;
+      font-weight: 500;
+      user-select: none;
+    }
+
+    .settings-item:hover,
+    .settings-item.active,
+    .wallpaper-subitem:hover,
+    .wallpaper-subitem.active {
+      background: rgba(255, 255, 255, 0.10);
+      transform: translateX(2px);
+    }
+
+    .settings-item + .settings-item,
+    .wallpaper-subitem + .wallpaper-subitem {
+      margin-top: 6px;
+    }
+
+    .settings-item-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .settings-item-caret {
+      width: 8px;
+      height: 8px;
+      border-right: 1.5px solid rgba(255, 255, 255, 0.82);
+      border-bottom: 1.5px solid rgba(255, 255, 255, 0.82);
+      transform: rotate(-45deg);
+      opacity: 0.9;
+      flex-shrink: 0;
+    }
+
+    .settings-item-value {
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 0.86rem;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .settings-toggle {
+      position: relative;
+      width: 34px;
+      height: 20px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      transition: background 0.18s ease;
+      flex-shrink: 0;
+    }
+
+    .settings-toggle::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      transition: transform 0.18s ease;
+    }
+
+    .settings-item.is-on .settings-toggle {
+      background: rgba(104, 255, 191, 0.38);
+    }
+
+    .settings-item.is-on .settings-toggle::after {
+      transform: translateX(14px);
+    }
+
+    .clock,
+    .date {
+      transition:
+        opacity 0.28s ease,
+        filter 0.34s ease,
+        transform 0.34s cubic-bezier(.2, .8, .2, 1),
+        max-height 0.34s cubic-bezier(.2, .8, .2, 1),
+        margin-bottom 0.28s ease;
+      overflow: hidden;
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .clock {
+      max-height: 60px;
+    }
+
+    .date {
+      max-height: 32px;
+    }
+
+    .clock.is-hidden,
+    .date.is-hidden {
+      opacity: 0;
+      filter: blur(10px);
+      transform: translateY(-6px);
+      max-height: 0;
+      pointer-events: none;
+    }
+
+
+    .clock.is-hidden {
+      margin-bottom: 0;
+    }
+
+    .rates-attribution {
+      position: fixed;
+      right: 132px;
+      bottom: 34px;
+      z-index: 115;
+      font-size: 0.72rem;
+      line-height: 1;
+      color: rgba(255, 255, 255, 0.42);
+      text-decoration: none;
+      transition: color 0.18s ease, opacity 0.18s ease;
+      opacity: 0.82;
+    }
+
+    .rates-attribution:hover {
+      color: rgba(255, 255, 255, 0.68);
+      opacity: 1;
+    }
+
+    .hl-ref {
+      position: fixed;
+      left: 22px;
+      bottom: 20px;
+      z-index: 115;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.34);
+      text-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
+      user-select: none;
+      pointer-events: none;
+      opacity: 0.82;
+    }
+
+    .hl-ref .lambda {
+      color: rgba(var(--accent-text-rgb), 0.56);
+      margin-right: 6px;
+      font-size: 0.9rem;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="ambient-particles" id="ambientParticles" aria-hidden="true"></div>
+    <div class="clock" id="clock">00:00:00</div>
+    <div class="date" id="date">Onsdag, 25, Marts</div>
+    <div class="weather-line" id="weatherLine">Henter vejr i København…</div>
+
+    <div class="search-wrap">
+      <div class="mode-sparkles" id="modeSparkles" aria-hidden="true"></div>
+      <form class="search-form" id="searchForm">
+        <input
+          class="search-input"
+          id="searchInput"
+          type="text"
+          placeholder="Search Google..."
+          autocomplete="off"
+          spellcheck="true"
+          autocorrect="on"
+          autocapitalize="off"
+          lang="en"
+          autofocus
+        />
+        <div class="engine-picker" id="enginePicker">
+          <button class="engine-trigger" id="engineTrigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Choose search engine">
+            <img class="engine-icon" id="engineTriggerIcon" src="https://www.google.com/favicon.ico" alt="" />
+            <span class="engine-label" id="engineTriggerLabel">Google</span>
+            <span class="engine-caret"></span>
+          </button>
+          <ul class="engine-menu" id="engineMenu" role="listbox" aria-label="Search engines"></ul>
+        </div>
+        <div class="ai-picker" id="aiPicker">
+          <button class="ai-trigger" id="aiTrigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Choose AI assistant">
+            <img class="ai-icon" id="aiTriggerIcon" src="https://www.google.com/s2/favicons?domain=chatgpt.com&sz=64" alt="" />
+            <span class="ai-label" id="aiTriggerLabel">ChatGPT</span>
+            <span class="ai-caret"></span>
+          </button>
+          <ul class="ai-menu" id="aiMenu" role="listbox" aria-label="AI assistants"></ul>
+        </div>
+      </form>
+      <div class="quick-result" id="quickResult" aria-live="polite">
+        <div class="quick-result-head">
+          <div class="quick-result-label" id="quickResultLabel">Calculator</div>
+          <button class="quick-result-copy" id="quickResultCopy" type="button" aria-label="Copy quick result">Copy</button>
+        </div>
+        <div class="quick-result-value" id="quickResultValue">0</div>
+      </div>
+      <div class="mode-toast" id="modeToast">Search</div>
+      <div class="copy-toast" id="copyToast">Prompt copied</div>
+      <ul class="suggestions" id="suggestions"></ul>
+    </div>
+  </div>
+
+
+  <div class="mode-toggle" id="modeToggle">
+    <button class="mode-toggle-btn is-search" id="modeToggleBtn" type="button" aria-label="Toggle AI mode">
+      <span class="mode-toggle-icon-wrap">
+        <span class="mode-toggle-icon">✦</span>
+        <span class="mode-toggle-question">?</span>
+      </span>
+    </button>
+  </div>
+
+  <div class="hl-ref" aria-hidden="true"><span class="lambda">λ</span>stay freeman</div>
+
+  <div class="settings-switcher" id="settingsSwitcher">
+    <button class="settings-trigger" id="settingsTrigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Open settings">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M13.98 6.2l3.75 3.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M14.06 4.94l1.25-1.25a1.77 1.77 0 0 1 2.5 0l1.5 1.5a1.77 1.77 0 0 1 0 2.5l-1.25 1.25" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <ul class="settings-menu" id="settingsMenu" role="listbox" aria-label="Settings">
+      <li class="settings-item" id="wallpaperSettingsItem" role="option">
+        <span class="settings-item-label">Wallpaper</span>
+        <span class="settings-item-caret"></span>
+      </li>
+      <li class="settings-item is-on" id="clockToggleItem" role="option">
+        <span class="settings-item-label">Clock</span>
+        <span class="settings-toggle"></span>
+      </li>
+      <li class="settings-item is-on" id="dateToggleItem" role="option">
+        <span class="settings-item-label">Date</span>
+        <span class="settings-toggle"></span>
+      </li>
+      <li class="settings-item is-on" id="weatherToggleItem" role="option">
+        <span class="settings-item-label">Weather</span>
+        <span class="settings-toggle"></span>
+      </li>
+      <li class="settings-item is-on" id="soundToggleItem" role="option">
+        <span class="settings-item-label">Sound</span>
+        <span class="settings-toggle"></span>
+      </li>
+    </ul>
+    <ul class="settings-submenu" id="wallpaperSubmenu" role="listbox" aria-label="Wallpaper selection"></ul>
+  </div>
+
+  <script>
+    const ambientParticles = document.getElementById('ambientParticles');
+    const clock = document.getElementById('clock');
+    const dateElement = document.getElementById('date');
+    const weatherLine = document.getElementById('weatherLine');
+
+    const danishDays = ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'];
+    const danishMonths = ['Januar', 'Februar', 'Marts', 'April', 'Maj', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'December'];
+
+    function updateDateTime() {
+      const now = new Date();
+      const time = now.toLocaleTimeString('en-GB', {
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+
+      clock.textContent = time;
+      dateElement.textContent = `${danishDays[now.getDay()]}, ${now.getDate()}, ${danishMonths[now.getMonth()]}`;
+    }
+
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
+    const modeSparkles = document.getElementById('modeSparkles');
+    const form = document.getElementById('searchForm');
+
+    function resetSearchBarLighting() {
+      form.style.removeProperty('--sheen-x');
+      form.style.removeProperty('--sheen-y');
+      form.style.removeProperty('--shadow-x');
+      form.style.removeProperty('--shadow-y');
+      form.style.removeProperty('--sheen-shift-x');
+      form.style.removeProperty('--sheen-shift-y');
+      form.style.removeProperty('--shadow-shift-x');
+      form.style.removeProperty('--shadow-shift-y');
+    }
+
+    let nextSparkleAt = 0;
+    let modeToggleAnimationTimer;
+    let settingsTriggerAnimationTimer;
+
+    function updateModeToggleUI() {
+      const isAI = currentMode === 'chatgpt';
+      modeToggleBtn.classList.toggle('is-ai', isAI);
+      modeToggleBtn.classList.toggle('is-search', !isAI);
+    }
+
+    function animateModeToggleButton() {
+      modeToggleBtn.classList.remove('is-switching');
+      void modeToggleBtn.offsetWidth;
+      modeToggleBtn.classList.add('is-switching');
+      clearTimeout(modeToggleAnimationTimer);
+      modeToggleAnimationTimer = setTimeout(() => {
+        modeToggleBtn.classList.remove('is-switching');
+      }, 260);
+    }
+
+    function animateSettingsTriggerButton() {
+      settingsTrigger.classList.remove('is-switching');
+      void settingsTrigger.offsetWidth;
+      settingsTrigger.classList.add('is-switching');
+      clearTimeout(settingsTriggerAnimationTimer);
+      settingsTriggerAnimationTimer = setTimeout(() => {
+        settingsTrigger.classList.remove('is-switching');
+      }, 260);
+    }
+
+    function burstModeSparkles() {
+      const now = Date.now();
+      if (!modeSparkles || now < nextSparkleAt) return;
+      nextSparkleAt = now + 820;
+      modeSparkles.innerHTML = '';
+
+      const points = [
+        { left: '10%', top: '26%', x: -14, y: -8, soft: false },
+        { left: '18%', top: '74%', x: -10, y: 8, soft: true },
+        { left: '32%', top: '14%', x: -6, y: -10, soft: true },
+        { left: '68%', top: '14%', x: 6, y: -10, soft: true },
+        { left: '82%', top: '74%', x: 10, y: 8, soft: true },
+        { left: '90%', top: '28%', x: 14, y: -8, soft: false },
+        { left: '50%', top: '4%', x: 0, y: -12, soft: false },
+        { left: '50%', top: '96%', x: 0, y: 12, soft: true }
+      ];
+
+      for (const point of points) {
+        const sparkle = document.createElement('span');
+        sparkle.className = 'mode-sparkle' + (point.soft ? ' is-soft' : '');
+        sparkle.style.left = point.left;
+        sparkle.style.top = point.top;
+        sparkle.style.setProperty('--sparkle-x', point.x + 'px');
+        sparkle.style.setProperty('--sparkle-y', point.y + 'px');
+        sparkle.style.animationDelay = (Math.random() * 70) + 'ms';
+        modeSparkles.appendChild(sparkle);
+      }
+
+      setTimeout(() => {
+        modeSparkles.innerHTML = '';
+      }, 900);
+    }
+
+    function pulseSearchBarModeSwitch() {
+      form.classList.remove('is-mode-switching');
+      void form.offsetWidth;
+      form.classList.add('is-mode-switching');
+      burstModeSparkles();
+      animateModeToggleButton();
+      setTimeout(() => {
+        form.classList.remove('is-mode-switching');
+      }, 320);
+    }
+
+
+    const input = document.getElementById('searchInput');
+    const searchWrap = document.querySelector('.search-wrap');
+    const suggestions = document.getElementById('suggestions');
+    const quickResult = document.getElementById('quickResult');
+    const quickResultLabel = document.getElementById('quickResultLabel');
+    const quickResultValue = document.getElementById('quickResultValue');
+    const quickResultCopy = document.getElementById('quickResultCopy');
+    const enginePicker = document.getElementById('enginePicker');
+    const engineTrigger = document.getElementById('engineTrigger');
+    const engineTriggerIcon = document.getElementById('engineTriggerIcon');
+    const engineTriggerLabel = document.getElementById('engineTriggerLabel');
+    const engineMenu = document.getElementById('engineMenu');
+    const modeToast = document.getElementById('modeToast');
+    const copyToast = document.getElementById('copyToast');
+    const modeToggleBtn = document.getElementById('modeToggleBtn');
+    const settingsTrigger = document.getElementById('settingsTrigger');
+    const settingsMenu = document.getElementById('settingsMenu');
+    const wallpaperSubmenu = document.getElementById('wallpaperSubmenu');
+    const wallpaperSettingsItem = document.getElementById('wallpaperSettingsItem');
+    const clockToggleItem = document.getElementById('clockToggleItem');
+    const dateToggleItem = document.getElementById('dateToggleItem');
+    const weatherToggleItem = document.getElementById('weatherToggleItem');
+    const soundToggleItem = document.getElementById('soundToggleItem');
+    const aiPicker = document.getElementById('aiPicker');
+    const aiTrigger = document.getElementById('aiTrigger');
+    const aiTriggerIcon = document.getElementById('aiTriggerIcon');
+    const aiTriggerLabel = document.getElementById('aiTriggerLabel');
+    const aiMenu = document.getElementById('aiMenu');
+
+
+    const wallpapers = [
+      { key: 'solid-white', label: 'Solid White', file: '' },
+      { key: 'solid-black', label: 'Solid Black', file: '' },
+      { key: 'wallpaper-1', label: 'Image #1', file: 'tlou wallpaper 2 helium.png' },
+      { key: 'wallpaper-2', label: 'Image #2', file: 'tlou wallpaper 3 helium.png' }
+    ];
+
+    function hideWallpaperSubmenu() {
+      wallpaperSubmenu.classList.remove('visible');
+      wallpaperSettingsItem.classList.remove('active');
+    }
+
+    function updateWallpaperSubmenuPosition() {
+      const gap = 10;
+      const menuHeight = settingsMenu ? settingsMenu.offsetHeight : 178;
+      wallpaperSubmenu.style.setProperty('--submenu-offset', `calc(100% + ${menuHeight + gap}px)`);
+    }
+
+    function showWallpaperSubmenu() {
+      updateWallpaperSubmenuPosition();
+      wallpaperSubmenu.classList.add('visible');
+      wallpaperSettingsItem.classList.add('active');
+    }
+
+    function hideSettingsMenu() {
+      settingsMenu.classList.remove('visible');
+      settingsTrigger.classList.remove('active');
+      settingsTrigger.setAttribute('aria-expanded', 'false');
+      hideWallpaperSubmenu();
+    }
+
+    function showSettingsMenu() {
+      settingsMenu.classList.add('visible');
+      settingsTrigger.classList.add('active');
+      settingsTrigger.setAttribute('aria-expanded', 'true');
+      requestAnimationFrame(updateWallpaperSubmenuPosition);
+    }
+
+    function buildWallpaperMenu() {
+      wallpaperSubmenu.innerHTML = wallpapers.map((item) => `
+        <li class="wallpaper-subitem" data-wallpaper="${item.key}" role="option">${item.label}</li>
+      `).join('');
+    }
+
+    function setWallpaper(wallpaperKey) {
+      const selected = wallpapers.find((item) => item.key === wallpaperKey) || wallpapers[0];
+
+      document.body.classList.remove('solid-background', 'dark-solid');
+
+      if (selected.key === 'solid-white') {
+        document.body.style.backgroundColor = '#ffffff';
+        document.body.style.backgroundImage = 'none';
+        document.body.classList.add('solid-background');
+      } else if (selected.key === 'solid-black') {
+        document.body.style.backgroundColor = '#05070a';
+        document.body.style.backgroundImage = 'none';
+        document.body.classList.add('solid-background', 'dark-solid');
+      } else if (selected.file) {
+        document.body.style.backgroundColor = '#05070a';
+        document.body.style.backgroundImage = "url('" + selected.file + "')";
+      } else {
+        document.body.style.backgroundColor = '#ffffff';
+        document.body.style.backgroundImage = 'none';
+        document.body.classList.add('solid-background');
+      }
+
+      try {
+        localStorage.setItem('heliumWallpaper', selected.key);
+      } catch (error) {
+      }
+
+      [...wallpaperSubmenu.children].forEach((item) => {
+        const isActive = item.dataset.wallpaper === selected.key;
+        item.classList.toggle('active', isActive);
+        item.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+    }
+
+    function applyClockDateVisibility() {
+      const showClock = (() => {
+        try {
+          const saved = localStorage.getItem('heliumShowClock');
+          return saved === null ? true : saved === 'true';
+        } catch (error) {
+          return true;
+        }
+      })();
+
+      const showDate = (() => {
+        try {
+          const saved = localStorage.getItem('heliumShowDate');
+          return saved === null ? true : saved === 'true';
+        } catch (error) {
+          return true;
+        }
+      })();
+
+      const showWeather = (() => {
+        try {
+          const saved = localStorage.getItem('heliumShowWeather');
+          return saved === null ? true : saved === 'true';
+        } catch (error) {
+          return true;
+        }
+      })();
+
+      clock.classList.toggle('is-hidden', !showClock);
+      dateElement.classList.toggle('is-hidden', !showDate);
+      const showSound = isSoundEnabled();
+
+      weatherLine.classList.toggle('is-hidden', !showWeather);
+      clockToggleItem.classList.toggle('is-on', showClock);
+      dateToggleItem.classList.toggle('is-on', showDate);
+      weatherToggleItem.classList.toggle('is-on', showWeather);
+      soundToggleItem.classList.toggle('is-on', showSound);
+
+      updateDateTime();
+    }
+
+    function setClockVisibility(isVisible) {
+      try {
+        localStorage.setItem('heliumShowClock', String(!!isVisible));
+      } catch (error) {
+      }
+      applyClockDateVisibility();
+    }
+
+    function setDateVisibility(isVisible) {
+      try {
+        localStorage.setItem('heliumShowDate', String(!!isVisible));
+      } catch (error) {
+      }
+      applyClockDateVisibility();
+    }
+
+    function setWeatherVisibility(isVisible) {
+      try {
+        localStorage.setItem('heliumShowWeather', String(!!isVisible));
+      } catch (error) {
+      }
+      applyClockDateVisibility();
+    }
+
+    function isSoundEnabled() {
+      try {
+        const saved = localStorage.getItem('heliumSoundEnabled');
+        return saved === null ? true : saved === 'true';
+      } catch (error) {
+        return true;
+      }
+    }
+
+    function setSoundEnabled(isEnabled) {
+      try {
+        localStorage.setItem('heliumSoundEnabled', String(!!isEnabled));
+      } catch (error) {
+      }
+      applyClockDateVisibility();
+    }
+
+    function getUIAudioContext() {
+      const AudioCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtor) return null;
+      if (!uiAudioContext) uiAudioContext = new AudioCtor();
+      return uiAudioContext;
+    }
+
+    async function unlockUIAudio() {
+      const ctx = getUIAudioContext();
+      if (!ctx) return null;
+      if (ctx.state === 'suspended') {
+        try { await ctx.resume(); } catch (error) {}
+      }
+      return ctx;
+    }
+
+    function playTone(ctx, start, frequency, duration, type = 'sine', volume = 0.02) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(frequency, start);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(volume, start + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + duration + 0.03);
+    }
+
+    function playUISound(kind = 'tap') {
+      if (!isSoundEnabled()) return;
+      const ctx = getUIAudioContext();
+      if (!ctx || ctx.state !== 'running') return;
+      const now = ctx.currentTime + 0.005;
+
+      if (kind === 'mode') {
+        playTone(ctx, now, 620, 0.08, 'triangle', 0.018);
+        playTone(ctx, now + 0.05, 880, 0.11, 'triangle', 0.016);
+        return;
+      }
+
+      if (kind === 'copy') {
+        playTone(ctx, now, 980, 0.05, 'sine', 0.016);
+        playTone(ctx, now + 0.035, 1310, 0.07, 'triangle', 0.012);
+        return;
+      }
+
+      if (kind === 'soft') {
+        playTone(ctx, now, 520, 0.05, 'sine', 0.012);
+        return;
+      }
+
+      playTone(ctx, now, 420, 0.045, 'triangle', 0.013);
+    }
+
+    const aiProviders = {
+      chatgpt: {
+        label: 'ChatGPT',
+        icon: 'https://www.google.com/s2/favicons?domain=chatgpt.com&sz=64',
+        supportsPrefill: true,
+        launch: (query) => {
+          const clean = String(query || '').trim();
+          return clean ? 'https://chatgpt.com/?q=' + encodeURIComponent(clean) : 'https://chatgpt.com/';
+        }
+      },
+      claude: {
+        label: 'Claude',
+        icon: 'https://www.google.com/s2/favicons?domain=claude.ai&sz=64',
+        supportsPrefill: false,
+        launch: () => 'https://claude.ai/new'
+      },
+      gemini: {
+        label: 'Gemini',
+        icon: 'https://www.google.com/s2/favicons?domain=gemini.google.com&sz=64',
+        supportsPrefill: false,
+        launch: () => 'https://gemini.google.com/app'
+      },
+      grok: {
+        label: 'Grok',
+        icon: 'https://www.google.com/s2/favicons?domain=grok.com&sz=64',
+        supportsPrefill: false,
+        launch: () => 'https://grok.com/'
+      }
+    };
+
+
+    const searchEngines = {
+      google: {
+        label: 'Google',
+        icon: 'https://www.google.com/s2/favicons?domain=google.com&sz=64',
+        searchUrl: 'https://www.google.com/search?q=',
+        suggest: (query) => jsonpRequest(`https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}`),
+        parseSuggestions: (data) => Array.isArray(data?.[1]) ? data[1] : []
+      },
+      kagi: {
+        label: 'Kagi',
+        icon: 'https://www.google.com/s2/favicons?domain=kagi.com&sz=64',
+        searchUrl: 'https://kagi.com/search?q='
+      },
+      duckduckgo: {
+        label: 'DuckDuckGo',
+        icon: 'https://www.google.com/s2/favicons?domain=duckduckgo.com&sz=64',
+        searchUrl: 'https://duckduckgo.com/?q=',
+        suggest: (query) => fetchJson(`https://ac.duckduckgo.com/ac/?q=${encodeURIComponent(query)}&type=list`),
+        parseSuggestions: (data) => Array.isArray(data) ? data.map((item) => typeof item === 'string' ? item : item?.phrase).filter(Boolean) : []
+      },
+      bing: {
+        label: 'Bing',
+        icon: 'https://www.google.com/s2/favicons?domain=bing.com&sz=64',
+        searchUrl: 'https://www.bing.com/search?q='
+      },
+      qwant: {
+        label: 'Qwant',
+        icon: 'https://www.google.com/s2/favicons?domain=qwant.com&sz=64',
+        searchUrl: 'https://www.qwant.com/?q='
+      }
+    };
+
+    let currentEngine = (() => {
+      try {
+        return localStorage.getItem('heliumSearchEngine') || 'google';
+      } catch (error) {
+        return 'google';
+      }
+    })();
+    let currentMode = 'search';
+    let currentAI = (() => {
+      try {
+        return localStorage.getItem('heliumAIProvider') || 'chatgpt';
+      } catch (error) {
+        return 'chatgpt';
+      }
+    })();
+    let activeIndex = -1;
+    let currentSuggestions = [];
+    let debounceTimer;
+    let quickResultToken = 0;
+    let suggestionRequestToken = 0;
+    let suggestionHideTimer;
+    let pickerSwitchTimer;
+    let engineMenuHideTimer;
+    let aiMenuHideTimer;
+    let modeToastTimer;
+    let quickCopyPulseTimer;
+    let toggleLockedUntil = 0;
+    let lastAIPromptIndex = -1;
+    let currentQuickCopyText = '';
+    let uiAudioContext = null;
+    const fxCache = new Map();
+    const fxBaseCache = new Map();
+    const helperCache = new Map();
+    const timezoneLookupCache = new Map();
+
+    const aiPlaceholderPrompts = [
+      'ask "{model}" anything…',
+      'ask "{model}" how big the sun is…',
+      'ask "{model}" for a movie recommendation…',
+      'ask "{model}" to explain black holes simply…',
+      'ask "{model}" for a better way to phrase a message…',
+      'ask "{model}" for a quick dinner idea…',
+      'ask "{model}" to compare two GPUs…',
+      'ask "{model}" for a cool sci-fi series…',
+      'ask "{model}" how many hours are in a year…',
+      'ask "{model}" to brainstorm edit ideas…',
+      'ask "{model}" for a clean caption…',
+      'ask "{model}" to summarize a topic fast…',
+      'ask "{model}" for a shortcut you forgot…',
+      'ask "{model}" what the biggest planet is…',
+      'ask "{model}" to help fix a sentence…',
+      'ask "{model}" for a random fun fact…',
+      'ask "{model}" what happens inside a supernova…',
+      'ask "{model}" for a good horror movie tonight…',
+      'ask "{model}" to rank the best space games…',
+      'ask "{model}" how lightning works…',
+      'ask "{model}" for a better TikTok caption…',
+      'ask "{model}" how tall Mount Everest is…',
+      'ask "{model}" what the coldest planet is…',
+      'ask "{model}" for a quick lunch idea…',
+      'ask "{model}" to explain time dilation…',
+      'ask "{model}" which keyboard switch sounds best…',
+      'ask "{model}" how SSDs actually work…',
+      'ask "{model}" for a cozy series recommendation…',
+      'ask "{model}" what causes auroras…',
+      'ask "{model}" how many moons Jupiter has…',
+      'ask "{model}" for a short scary story…',
+      'ask "{model}" to help name a project…',
+      'ask "{model}" how big a blue whale is…',
+      'ask "{model}" why the ocean looks blue…',
+      'ask "{model}" what the fastest animal is…',
+      'ask "{model}" for a clean Discord announcement…',
+      'ask "{model}" to explain quantum mechanics simply…',
+      'ask "{model}" how hot the sun is…',
+      'ask "{model}" what the rarest blood type is…',
+      'ask "{model}" for a random movie fact…',
+      'ask "{model}" how to phrase a polite reply…',
+      'ask "{model}" what the oldest star might be…',
+      'ask "{model}" how big Saturn’s rings are…',
+      'ask "{model}" for a better channel name…',
+      'ask "{model}" to compare OLED and IPS…',
+      'ask "{model}" how much sleep people need…',
+      'ask "{model}" for a strong username idea…',
+      'ask "{model}" what causes earthquakes…',
+      'ask "{model}" why cats purr…',
+      'ask "{model}" how airplanes stay in the air…',
+      'ask "{model}" for a funny one-liner…',
+      'ask "{model}" how cameras capture color…',
+      'ask "{model}" what the deepest ocean point is…',
+      'ask "{model}" for a cleaner sentence structure…',
+      'ask "{model}" how volcanoes form…',
+      'ask "{model}" what the strongest muscle is…',
+      'ask "{model}" for a solid playlist idea…',
+      'ask "{model}" how touchscreens work…',
+      'ask "{model}" why the sky changes color at sunset…',
+      'ask "{model}" what the nearest galaxy is…',
+      'ask "{model}" to explain entropy simply…',
+      'ask "{model}" for a better email opener…',
+      'ask "{model}" how rainbows form…',
+      'ask "{model}" what black ice is…',
+      'ask "{model}" for a quick breakfast idea…',
+      'ask "{model}" how magnets work…',
+      'ask "{model}" what causes tides…',
+      'ask "{model}" for a cool edit concept…',
+      'ask "{model}" which movie has the best cinematography…',
+      'ask "{model}" what the speed of sound is…',
+      'ask "{model}" how glaciers move…',
+      'ask "{model}" for a punchier title…',
+      'ask "{model}" why popcorn pops…',
+      'ask "{model}" what the brightest star is…',
+      'ask "{model}" how Wi-Fi works…',
+      'ask "{model}" for a stronger intro line…',
+      'ask "{model}" how long a day on Venus is…',
+      'ask "{model}" why leaves change color…',
+      'ask "{model}" what antimatter is…',
+      'ask "{model}" for a sleek bio line…',
+      'ask "{model}" how many bones sharks have…',
+      'ask "{model}" why ice is slippery…',
+      'ask "{model}" what photosynthesis actually does…',
+      'ask "{model}" for a short poem…',
+      'ask "{model}" how eclipses happen…',
+      'ask "{model}" what the biggest moon is…',
+      'ask "{model}" how long light takes from the sun…',
+      'ask "{model}" for a random editing tip…',
+      'ask "{model}" why mirrors flip left and right…',
+      'ask "{model}" what the tallest animal is…',
+      'ask "{model}" how submarines dive…',
+      'ask "{model}" for a smarter search query…',
+      'ask "{model}" why stars twinkle…',
+      'ask "{model}" what DNA does…',
+      'ask "{model}" how satellites stay up…',
+      'ask "{model}" for a neat fun fact about space…',
+      'ask "{model}" why fire is hot…',
+      'ask "{model}" what the smallest planet is…',
+      'ask "{model}" how headphones make spatial audio…',
+      'ask "{model}" why Jonah is so sexy..',
+    ];
+
+    function getRandomAIPlaceholder(modelLabel) {
+      if (!aiPlaceholderPrompts.length) {
+        return `ask "${modelLabel}" anything…`;
+      }
+
+      let index = Math.floor(Math.random() * aiPlaceholderPrompts.length);
+      if (aiPlaceholderPrompts.length > 1 && index === lastAIPromptIndex) {
+        index = (index + 1) % aiPlaceholderPrompts.length;
+      }
+      lastAIPromptIndex = index;
+
+      return aiPlaceholderPrompts[index].replace('{model}', modelLabel);
+    }
+
+    const fallbackSuggestions = [
+      'YouTube',
+      'Gmail',
+      'Google Drive',
+      'Discord',
+      'Instagram',
+      'TikTok',
+      'Letterboxd',
+      'scenepacks',
+      'Breaking Bad edits',
+      'The Last of Us'
+    ];
+
+    const fixedWeatherLocationLabel = 'København';
+
+    const weatherCodeMap = {
+      0: 'Klar himmel',
+      1: 'Mest klart',
+      2: 'Delvist skyet',
+      3: 'Overskyet',
+      45: 'Tåget',
+      48: 'Rimtåge',
+      51: 'Let støvregn',
+      53: 'Støvregn',
+      55: 'Kraftig støvregn',
+      56: 'Isslag med støvregn',
+      57: 'Tæt isslag med støvregn',
+      61: 'Let regn',
+      63: 'Regn',
+      65: 'Kraftig regn',
+      66: 'Isslag',
+      67: 'Kraftig isslag',
+      71: 'Let sne',
+      73: 'Sne',
+      75: 'Kraftig sne',
+      77: 'Snekorn',
+      80: 'Regnbyger',
+      81: 'Kraftige regnbyger',
+      82: 'Meget kraftige regnbyger',
+      85: 'Snebyger',
+      86: 'Kraftige snebyger',
+      95: 'Tordenvejr',
+      96: 'Tordenvejr med hagl',
+      99: 'Kraftigt tordenvejr med hagl'
+    };
+
+    const unitDefinitions = {
+      mm: { category: 'length', label: 'mm', toBase: (v) => v / 1000, fromBase: (v) => v * 1000 },
+      cm: { category: 'length', label: 'cm', toBase: (v) => v / 100, fromBase: (v) => v * 100 },
+      meter: { category: 'length', label: 'm', toBase: (v) => v, fromBase: (v) => v },
+      km: { category: 'length', label: 'km', toBase: (v) => v * 1000, fromBase: (v) => v / 1000 },
+      inch: { category: 'length', label: 'in', toBase: (v) => v * 0.0254, fromBase: (v) => v / 0.0254 },
+      foot: { category: 'length', label: 'ft', toBase: (v) => v * 0.3048, fromBase: (v) => v / 0.3048 },
+      yard: { category: 'length', label: 'yd', toBase: (v) => v * 0.9144, fromBase: (v) => v / 0.9144 },
+      mile: { category: 'length', label: 'mi', toBase: (v) => v * 1609.344, fromBase: (v) => v / 1609.344 },
+      mg: { category: 'mass', label: 'mg', toBase: (v) => v / 1000000, fromBase: (v) => v * 1000000 },
+      gram: { category: 'mass', label: 'g', toBase: (v) => v / 1000, fromBase: (v) => v * 1000 },
+      kg: { category: 'mass', label: 'kg', toBase: (v) => v, fromBase: (v) => v },
+      ounce: { category: 'mass', label: 'oz', toBase: (v) => v * 0.028349523125, fromBase: (v) => v / 0.028349523125 },
+      pound: { category: 'mass', label: 'lb', toBase: (v) => v * 0.45359237, fromBase: (v) => v / 0.45359237 },
+      stone: { category: 'mass', label: 'st', toBase: (v) => v * 6.35029318, fromBase: (v) => v / 6.35029318 },
+      ml: { category: 'volume', label: 'ml', toBase: (v) => v / 1000, fromBase: (v) => v * 1000 },
+      liter: { category: 'volume', label: 'L', toBase: (v) => v, fromBase: (v) => v },
+      cup: { category: 'volume', label: 'cup', toBase: (v) => v * 0.2365882365, fromBase: (v) => v / 0.2365882365 },
+      pint: { category: 'volume', label: 'pt', toBase: (v) => v * 0.473176473, fromBase: (v) => v / 0.473176473 },
+      quart: { category: 'volume', label: 'qt', toBase: (v) => v * 0.946352946, fromBase: (v) => v / 0.946352946 },
+      gallon: { category: 'volume', label: 'gal', toBase: (v) => v * 3.785411784, fromBase: (v) => v / 3.785411784 },
+      kmh: { category: 'speed', label: 'km/h', toBase: (v) => v, fromBase: (v) => v },
+      mph: { category: 'speed', label: 'mph', toBase: (v) => v * 1.609344, fromBase: (v) => v / 1.609344 },
+      mps: { category: 'speed', label: 'm/s', toBase: (v) => v * 3.6, fromBase: (v) => v / 3.6 },
+      knot: { category: 'speed', label: 'kn', toBase: (v) => v * 1.852, fromBase: (v) => v / 1.852 },
+      celsius: { category: 'temperature', label: '°C', toBase: (v) => v, fromBase: (v) => v },
+      fahrenheit: { category: 'temperature', label: '°F', toBase: (v) => (v - 32) * (5 / 9), fromBase: (v) => v * (9 / 5) + 32 },
+      kelvin: { category: 'temperature', label: 'K', toBase: (v) => v - 273.15, fromBase: (v) => v + 273.15 }
+    };
+
+    const unitAliases = {
+      'mm': 'mm','millimeter': 'mm','millimeters': 'mm','millimetre': 'mm','millimetres': 'mm',
+      'cm': 'cm','centimeter': 'cm','centimeters': 'cm','centimetre': 'cm','centimetres': 'cm',
+      'meter': 'meter','meters': 'meter','metre': 'meter','metres': 'meter',
+      'km': 'km','kilometer': 'km','kilometers': 'km','kilometre': 'km','kilometres': 'km',
+      'inch': 'inch','inches': 'inch','ft': 'foot','foot': 'foot','feet': 'foot',
+      'yd': 'yard','yard': 'yard','yards': 'yard','mi': 'mile','mile': 'mile','miles': 'mile',
+      'mg': 'mg','milligram': 'mg','milligrams': 'mg','g': 'gram','gram': 'gram','grams': 'gram',
+      'kg': 'kg','kilogram': 'kg','kilograms': 'kg','oz': 'ounce','ounce': 'ounce','ounces': 'ounce',
+      'lb': 'pound','lbs': 'pound','pound': 'pound','pounds': 'pound','st': 'stone','stone': 'stone',
+      'ml': 'ml','milliliter': 'ml','milliliters': 'ml','millilitre': 'ml','millilitres': 'ml',
+      'l': 'liter','liter': 'liter','liters': 'liter','litre': 'liter','litres': 'liter',
+      'cup': 'cup','cups': 'cup','pt': 'pint','pint': 'pint','pints': 'pint','qt': 'quart','quart': 'quart','quarts': 'quart',
+      'gal': 'gallon','gallon': 'gallon','gallons': 'gallon',
+      'km/h': 'kmh','kmh': 'kmh','kph': 'kmh','kilometers per hour': 'kmh','kilometres per hour': 'kmh',
+      'mph': 'mph','miles per hour': 'mph','m/s': 'mps','meters per second': 'mps','metres per second': 'mps',
+      'knot': 'knot','knots': 'knot','kn': 'knot',
+      'c': 'celsius','°c': 'celsius','℃': 'celsius','celsius': 'celsius','centigrade': 'celsius',
+      'f': 'fahrenheit','°f': 'fahrenheit','℉': 'fahrenheit','fahrenheit': 'fahrenheit',
+      'k': 'kelvin','kelvin': 'kelvin'
+    };
+
+    const unitAliasEntries = Object.entries(unitAliases)
+      .sort((a, b) => b[0].length - a[0].length)
+      .map(([alias, key]) => {
+        const hasLetters = /[a-z]/i.test(alias);
+        const pattern = hasLetters
+          ? new RegExp('\\b' + alias.split(/\s+/).map(escapeRegExp).join('\\s+') + '\\b', 'gi')
+          : new RegExp(escapeRegExp(alias), 'g');
+        return { alias, key, pattern };
+      });
+
+    function extractUnitMentions(query) {
+      const text = String(query || '').toLowerCase();
+      const matches = [];
+
+      for (const entry of unitAliasEntries) {
+        entry.pattern.lastIndex = 0;
+        let match;
+        while ((match = entry.pattern.exec(text)) !== null) {
+          matches.push({ start: match.index, end: match.index + match[0].length, key: entry.key });
+          if (!match[0].length) entry.pattern.lastIndex += 1;
+        }
+      }
+
+      matches.sort((a, b) => a.start !== b.start ? a.start - b.start : (b.end - b.start) - (a.end - a.start));
+
+      const filtered = [];
+      for (const match of matches) {
+        const overlaps = filtered.some((kept) => !(match.end <= kept.start || match.start >= kept.end));
+        if (!overlaps) filtered.push(match);
+      }
+
+      return filtered;
+    }
+
+    function convertUnitValue(amount, fromKey, toKey) {
+      const fromUnit = unitDefinitions[fromKey];
+      const toUnit = unitDefinitions[toKey];
+      if (!fromUnit || !toUnit || fromUnit.category !== toUnit.category) return null;
+      const baseValue = fromUnit.toBase(amount);
+      return toUnit.fromBase(baseValue);
+    }
+
+    function formatUnitResult(value, key) {
+      const unit = unitDefinitions[key];
+      return unit ? (formatResultNumber(value) + ' ' + unit.label) : formatResultNumber(value);
+    }
+
+    function parseTimezoneLookup(query) {
+      const trimmed = stripQuickPrefixes(query).trim();
+      if (!trimmed || currentMode !== 'search') return null;
+
+      const patterns = [
+        /^(?:what\s+time\s+is\s+it\s+in|what\s+time\s+is\s+it\s+at|time\s+in|time\s+at|current\s+time\s+in|timezone\s+in|timezone\s+for|time\s+zone\s+in|clock\s+in)\s+(.+)$/i,
+        /^(?:tid(?:en)?\s+i|klokken\s+i|hvad\s+er\s+klokken\s+i|hvad\s+er\s+tiden\s+i|tidszone\s+i|tidszone\s+for)\s+(.+)$/i,
+        /^(.+?)\s+time$/i
+      ];
+
+      for (const pattern of patterns) {
+        const match = trimmed.match(pattern);
+        if (match && match[1] && match[1].trim().length >= 2) return match[1].trim();
+      }
+
+      return null;
+    }
+
+    async function fetchTimezoneLocation(locationName) {
+      const key = String(locationName || '').trim().toLowerCase();
+      if (!key) return null;
+      if (timezoneLookupCache.has(key)) return timezoneLookupCache.get(key);
+
+      const response = await fetch(
+        'https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(locationName) + '&count=1&language=en&format=json',
+        { method: 'GET', mode: 'cors', credentials: 'omit', cache: 'force-cache' }
+      );
+      if (!response.ok) throw new Error('Timezone lookup failed');
+      const data = await response.json();
+      const result = Array.isArray(data?.results) ? data.results[0] : null;
+      timezoneLookupCache.set(key, result || null);
+      return result || null;
+    }
+
+    function formatTimezoneQuickResult(place) {
+      if (!place || !place.timezone) return null;
+      const now = new Date();
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: place.timezone,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        timeZoneName: 'short'
+      }).formatToParts(now);
+
+      return {
+        label: [place.name, place.country].filter(Boolean).join(', '),
+        value: parts.map((part) => part.value).join('')
+      };
+    }
+
+    async function fetchWeatherForCoords(latitude, longitude) {
+      const response = await fetch(
+        'https://api.open-meteo.com/v1/forecast?latitude=' + encodeURIComponent(latitude) +
+        '&longitude=' + encodeURIComponent(longitude) +
+        '&current=temperature_2m,weather_code,is_day&temperature_unit=celsius&timezone=Europe%2FCopenhagen',
+        { method: 'GET', mode: 'cors', credentials: 'omit', cache: 'no-cache' }
+      );
+      if (!response.ok) throw new Error('Weather request failed');
+      const data = await response.json();
+      return data?.current || null;
+    }
+
+    async function geocodeFallbackWeatherLocation() {
+      const cached = helperCache.get('__weatherFallback');
+      if (cached) return cached;
+      const response = await fetch(
+        'https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(defaultWeatherLocation) + '&count=1&language=en&format=json',
+        { method: 'GET', mode: 'cors', credentials: 'omit', cache: 'force-cache' }
+      );
+      if (!response.ok) throw new Error('Weather fallback lookup failed');
+      const data = await response.json();
+      const result = Array.isArray(data?.results) ? data.results[0] : null;
+      helperCache.set('__weatherFallback', result || null);
+      return result || null;
+    }
+
+    function setWeatherLine(text) {
+      weatherLine.textContent = text;
+    }
+
+    async function refreshWeatherLine() {
+      try {
+        const latitude = 55.6761;
+        const longitude = 12.5683;
+        const current = await fetchWeatherForCoords(latitude, longitude);
+
+        if (!current || typeof current.temperature_2m !== 'number') {
+          setWeatherLine('Vejr utilgængeligt');
+          return;
+        }
+
+        const description = weatherCodeMap[current.weather_code] || 'Nuværende vejr';
+        setWeatherLine(fixedWeatherLocationLabel + ' · ' + Math.round(current.temperature_2m) + '°C · ' + description);
+      } catch (error) {
+        setWeatherLine('Vejr utilgængeligt');
+      }
+    }
+
+    function seededUnit(index, salt = 0) {
+      const value = Math.sin((index + 1) * 127.1 + salt * 311.7) * 43758.5453123;
+      return value - Math.floor(value);
+    }
+
+    function buildAmbientParticles() {
+      if (!ambientParticles) return;
+      ambientParticles.innerHTML = '';
+
+      const count = 28;
+      const nowMs = Date.now();
+
+      for (let index = 0; index < count; index += 1) {
+        const particle = document.createElement('span');
+
+        const size = 5 + seededUnit(index, 1) * 9;
+        const driftX = (seededUnit(index, 2) * 62) - 31;
+        const driftY = -(130 + seededUnit(index, 3) * 240);
+        const left = seededUnit(index, 4) * 100;
+        const top = 52 + seededUnit(index, 5) * 44;
+        const durationMs = 15000 + seededUnit(index, 6) * 17000;
+        const pulseMs = 4800 + seededUnit(index, 7) * 4200;
+        const opacity = 0.14 + seededUnit(index, 8) * 0.18;
+        const phaseMs = nowMs % durationMs;
+        const pulsePhaseMs = nowMs % pulseMs;
+
+        particle.className = 'ambient-particle' + (seededUnit(index, 9) > 0.36 ? ' is-green' : '');
+        particle.style.width = size.toFixed(2) + 'px';
+        particle.style.height = size.toFixed(2) + 'px';
+        particle.style.left = left.toFixed(2) + '%';
+        particle.style.top = top.toFixed(2) + '%';
+        particle.style.setProperty('--drift-x', driftX.toFixed(1) + 'px');
+        particle.style.setProperty('--drift-y', driftY.toFixed(1) + 'px');
+        particle.style.setProperty('--drift', (durationMs / 1000).toFixed(2) + 's');
+        particle.style.setProperty('--pulse', (pulseMs / 1000).toFixed(2) + 's');
+        particle.style.setProperty('--delay', '-' + (phaseMs / 1000).toFixed(2) + 's');
+        particle.style.setProperty('--pulse-delay', '-' + (pulsePhaseMs / 1000).toFixed(2) + 's');
+        particle.style.setProperty('--opacity', opacity.toFixed(2));
+        ambientParticles.appendChild(particle);
+      }
+    }
+
+    function hideSuggestions() {
+      clearTimeout(suggestionHideTimer);
+      suggestions.classList.remove('visible');
+      currentSuggestions = [];
+      activeIndex = -1;
+
+      suggestionHideTimer = setTimeout(() => {
+        if (!suggestions.classList.contains('visible')) {
+          suggestions.innerHTML = '';
+        }
+      }, 220);
+    }
+
+    function hideQuickResult() {
+      currentQuickCopyText = '';
+      quickResult.classList.remove('is-copyable');
+      searchWrap.classList.remove('has-result');
+      quickResult.classList.remove('visible');
+    }
+
+    function showQuickResult(label, value, options = {}) {
+      quickResultLabel.textContent = label;
+      quickResultValue.textContent = value;
+      currentQuickCopyText = options.copyText || '';
+      quickResult.classList.toggle('is-copyable', !!currentQuickCopyText);
+      searchWrap.classList.add('has-result');
+      quickResult.classList.add('visible');
+    }
+
+    function hideEngineMenu() {
+      clearTimeout(engineMenuHideTimer);
+      if (engineMenu.classList.contains('visible')) {
+        engineMenu.classList.remove('visible');
+        engineMenu.classList.add('closing');
+        engineMenuHideTimer = setTimeout(() => {
+          engineMenu.classList.remove('closing');
+        }, 160);
+      } else {
+        engineMenu.classList.remove('closing');
+      }
+      engineTrigger.classList.remove('active');
+      engineTrigger.setAttribute('aria-expanded', 'false');
+    }
+    function hideAIMenu() {
+      clearTimeout(aiMenuHideTimer);
+      if (aiMenu.classList.contains('visible')) {
+        aiMenu.classList.remove('visible');
+        aiMenu.classList.add('closing');
+        aiMenuHideTimer = setTimeout(() => {
+          aiMenu.classList.remove('closing');
+        }, 160);
+      } else {
+        aiMenu.classList.remove('closing');
+      }
+      aiTrigger.classList.remove('active');
+      aiTrigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function showAIMenu() {
+      clearTimeout(aiMenuHideTimer);
+      aiMenu.classList.remove('closing');
+      aiMenu.classList.add('visible');
+      aiTrigger.classList.add('active');
+      aiTrigger.setAttribute('aria-expanded', 'true');
+    }
+
+    function setAIProvider(providerKey) {
+      const validKey = providerKey in aiProviders ? providerKey : 'chatgpt';
+      const selected = aiProviders[validKey] || aiProviders.chatgpt;
+      currentAI = validKey;
+
+      try {
+        localStorage.setItem('heliumAIProvider', currentAI);
+      } catch (error) {
+      }
+
+      aiTriggerIcon.src = selected.icon;
+      aiTriggerLabel.textContent = selected.label;
+
+      [...aiMenu.children].forEach((item) => {
+        const isActive = item.dataset.ai === currentAI;
+        item.classList.toggle('active', isActive);
+        item.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+
+      if (currentMode === 'chatgpt') {
+        input.placeholder = getRandomAIPlaceholder(selected.label);
+      }
+    }
+
+    function buildAIMenu() {
+      aiMenu.innerHTML = Object.entries(aiProviders)
+        .map(([key, provider]) => `
+          <li class="ai-option${key === currentAI ? ' active' : ''}" data-ai="${key}" role="option" aria-selected="${key === currentAI}">
+            <img class="ai-icon" src="${provider.icon}" alt="" />
+            <span>${provider.label}</span>
+          </li>
+        `)
+        .join('');
+    }
+
+
+    function showEngineMenu() {
+      clearTimeout(engineMenuHideTimer);
+      engineMenu.classList.remove('closing');
+      engineMenu.classList.add('visible');
+      engineTrigger.classList.add('active');
+      engineTrigger.setAttribute('aria-expanded', 'true');
+    }
+
+    function showModeToast(label, isChatGPT) {
+      clearTimeout(modeToastTimer);
+      modeToast.textContent = label;
+      modeToast.classList.toggle('chatgpt', isChatGPT);
+      modeToast.classList.add('visible');
+      modeToastTimer = setTimeout(() => {
+        modeToast.classList.remove('visible');
+      }, 800);
+    }
+
+    function updateModeUI(showToast = false) {
+      const isChatGPT = currentMode === 'chatgpt';
+      const selectedAI = aiProviders[currentAI] || aiProviders.chatgpt;
+      form.classList.toggle('mode-chatgpt', isChatGPT);
+      updateModeToggleUI();
+      hideEngineMenu();
+      hideAIMenu();
+      hideSettingsMenu();
+      hideSuggestions();
+      hideQuickResult();
+      input.placeholder = isChatGPT
+        ? getRandomAIPlaceholder(selectedAI.label)
+        : `Search ${searchEngines[currentEngine].label}...`;
+      if (showToast) showModeToast(isChatGPT ? selectedAI.label : 'Search', isChatGPT);
+    }
+
+    function toggleMode(forceMode) {
+      const nextMode = forceMode || (currentMode === 'search' ? 'chatgpt' : 'search');
+      const switchClass = nextMode === 'search' ? 'switching-to-search' : 'switching-to-ai';
+
+      form.classList.remove('switching-to-search', 'switching-to-ai');
+      currentMode = nextMode;
+      updateModeUI(true);
+      resetSearchBarLighting();
+      pulseSearchBarModeSwitch();
+
+      void form.offsetWidth;
+      form.classList.add(switchClass);
+      clearTimeout(pickerSwitchTimer);
+      pickerSwitchTimer = setTimeout(() => {
+        form.classList.remove('switching-to-search', 'switching-to-ai');
+      }, 320);
+
+      focusSearchInput(false);
+    }
+
+    function setEngine(engineKey) {
+      const validKey = engineKey in searchEngines ? engineKey : 'google';
+      const selectedEngine = searchEngines[validKey] || searchEngines.google;
+      currentEngine = validKey;
+
+      try {
+        localStorage.setItem('heliumSearchEngine', currentEngine);
+      } catch (error) {
+      }
+
+      engineTriggerIcon.src = selectedEngine.icon;
+      engineTriggerLabel.textContent = selectedEngine.label;
+      if (currentMode === 'search') {
+        input.placeholder = `Search ${selectedEngine.label}...`;
+      }
+
+      [...engineMenu.children].forEach((item) => {
+        const isActive = item.dataset.engine === currentEngine;
+        item.classList.toggle('active', isActive);
+        item.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+    }
+
+    function buildEngineMenu() {
+      engineMenu.innerHTML = Object.entries(searchEngines)
+        .map(([key, engine]) => `
+          <li class="engine-option${key === currentEngine ? ' active' : ''}" data-engine="${key}" role="option" aria-selected="${key === currentEngine}">
+            <img class="engine-icon" src="${engine.icon}" alt="" />
+            <span>${engine.label}</span>
+          </li>
+        `)
+        .join('');
+    }
+
+    
+    function looksLikeDirectUrl(value) {
+      const query = String(value || '').trim();
+      if (!query || /\s/.test(query) || query.includes('@')) {
+        return false;
+      }
+
+      return /^(?:(?:https?):\/\/)?(?:localhost|\d{1,3}(?:\.\d{1,3}){3}|(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24})(?::\d{2,5})?(?:[/?#][^\s]*)?$/i.test(query);
+    }
+
+    function normalizeDirectUrl(value) {
+      const query = String(value || '').trim();
+      if (/^https?:\/\//i.test(query)) {
+        return query;
+      }
+      return 'https://' + query;
+    }
+
+    function performSearch(query) {
+      const cleanQuery = String(query || '').trim();
+      if (!cleanQuery) return;
+
+      hideSuggestions();
+      hideQuickResult();
+
+      if (looksLikeDirectUrl(cleanQuery)) {
+        window.location.href = normalizeDirectUrl(cleanQuery);
+        return;
+      }
+
+      const selectedEngine = searchEngines[currentEngine] || searchEngines.google;
+      const url = `${selectedEngine.searchUrl}${encodeURIComponent(cleanQuery)}`;
+      window.location.href = url;
+    }
+
+    let copyToastTimer;
+
+    function showCopyToast(message) {
+      clearTimeout(copyToastTimer);
+      copyToast.textContent = message;
+      copyToast.classList.add('visible');
+      copyToastTimer = setTimeout(() => {
+        copyToast.classList.remove('visible');
+      }, 900);
+    }
+
+    async function copyTextToClipboard(text) {
+      const value = String(text || '');
+      if (!value) return false;
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(value);
+          return true;
+        }
+      } catch (error) {
+      }
+
+      try {
+        const helper = document.createElement('textarea');
+        helper.value = value;
+        helper.setAttribute('readonly', '');
+        helper.style.position = 'fixed';
+        helper.style.opacity = '0';
+        helper.style.pointerEvents = 'none';
+        helper.style.left = '-9999px';
+        document.body.appendChild(helper);
+        helper.focus();
+        helper.select();
+        const success = document.execCommand('copy');
+        helper.remove();
+        return !!success;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    async function openSelectedAIWithPrompt(prompt) {
+      const selected = aiProviders[currentAI] || aiProviders.chatgpt;
+      const clean = String(prompt || '').trim();
+
+      if (selected.supportsPrefill) {
+        window.location.href = selected.launch(clean);
+        return;
+      }
+
+      const copied = await copyTextToClipboard(clean);
+      if (copied && clean) {
+        showCopyToast('Prompt copied for ' + selected.label);
+      }
+
+      setTimeout(() => {
+        window.location.href = selected.launch(clean);
+      }, copied && clean ? 120 : 0);
+    }
+
+    function renderSuggestions(items) {
+      clearTimeout(suggestionHideTimer);
+      currentSuggestions = items.slice(0, 8);
+      activeIndex = -1;
+
+      if (!currentSuggestions.length) {
+        hideSuggestions();
+        return;
+      }
+
+      const typedQuery = input.value.trim();
+      currentSuggestions = currentSuggestions.map((item) => {
+        if (item.toLowerCase().startsWith(typedQuery.toLowerCase())) {
+          return typedQuery + item.slice(typedQuery.length);
+        }
+        return item;
+      });
+
+      suggestions.innerHTML = currentSuggestions
+        .map((item, index) => '<li class="suggestion-item" data-index="' + index + '">' + item + '</li>')
+        .join('');
+
+      requestAnimationFrame(() => {
+        suggestions.classList.add('visible');
+      });
+    }
+
+    function formatResultNumber(value) {
+      return new Intl.NumberFormat('da-DK', {
+        maximumFractionDigits: 8
+      }).format(value);
+    }
+
+    
+    function normalizeMathQuery(query) {
+      let text = stripQuickPrefixes(query).toLowerCase();
+
+      text = text
+        .replace(/[−–—]/g, '-')
+        .replace(/[×⋅·]/g, '*')
+        .replace(/(\d|\))\s*[xX]\s*(\d|\()/g, '$1*$2')
+        .replace(/[÷]/g, '/')
+        .replace(/\bthe\s+/g, '')
+        .replace(/\bopen\s+parenthesis\b/g, '(')
+        .replace(/\bclose\s+parenthesis\b/g, ')')
+        .replace(/\bopen\s+bracket\b/g, '(')
+        .replace(/\bclose\s+bracket\b/g, ')')
+        .replace(/\bplus\b/g, '+')
+        .replace(/\badd(ed)?\s+to\b/g, '+')
+        .replace(/\bminus\b/g, '-')
+        .replace(/\bsubtract(ed)?\s+by\b/g, '-')
+        .replace(/\bless\b/g, '-')
+        .replace(/\btimes\b/g, '*')
+        .replace(/\bmultiplied\s+by\b/g, '*')
+        .replace(/\bmultiply\s+by\b/g, '*')
+        .replace(/\binto\b/g, '*')
+        .replace(/\bdivided\s+by\b/g, '/')
+        .replace(/\bdivide\s+by\b/g, '/')
+        .replace(/\bover\b/g, '/')
+        .replace(/\bmodulo\b/g, '%')
+        .replace(/\bmod\b/g, '%')
+        .replace(/\bto\s+the\s+power\s+of\b/g, '^')
+        .replace(/\braised\s+to\b/g, '^')
+        .replace(/\bpower\s+of\b/g, '^')
+        .replace(/\bsquared\b/g, '^2')
+        .replace(/\bcubed\b/g, '^3')
+        .replace(/\bpercent\s+of\b/g, '% of')
+        .replace(/(\d+(?:[.,]\d+)?)\s*%\s*of\s*/g, '($1/100)*')
+        .replace(/(\d+(?:[.,]\d+)?)\s*percent\s+of\s*/g, '($1/100)*')
+        .replace(/(\d+(?:[.,]\d+)?)\s*percent\b/g, '($1/100)')
+        .replace(/\bsquare\s+root\s+of\s+/g, 'sqrt(')
+        .replace(/\bsquare\s+root\s+/g, 'sqrt(')
+        .replace(/\bcube\s+root\s+of\s+/g, 'cbrt(')
+        .replace(/\bcube\s+root\s+/g, 'cbrt(')
+        .replace(/√\s*/g, 'sqrt(')
+        .replace(/\broot\s+of\s+/g, 'sqrt(')
+        .replace(/\bsqrt\s+of\s+/g, 'sqrt(')
+        .replace(/\bsqrt\s+/g, 'sqrt(')
+        .replace(/\bcbrt\s+of\s+/g, 'cbrt(')
+        .replace(/\bcbrt\s+/g, 'cbrt(')
+        .replace(/\babsolute\s+value\s+of\s+/g, 'abs(')
+        .replace(/\babs\s+of\s+/g, 'abs(')
+        .replace(/\babs\s+/g, 'abs(')
+        .replace(/\bround\s+of\s+/g, 'round(')
+        .replace(/\bround\s+/g, 'round(')
+        .replace(/\bfloor\s+of\s+/g, 'floor(')
+        .replace(/\bfloor\s+/g, 'floor(')
+        .replace(/\bceiling\s+of\s+/g, 'ceil(')
+        .replace(/\bceil(?:ing)?\s+of\s+/g, 'ceil(')
+        .replace(/\bceil(?:ing)?\s+/g, 'ceil(')
+        .replace(/\bsine\s+of\s+/g, 'sin(')
+        .replace(/\bsin\s+of\s+/g, 'sin(')
+        .replace(/\bsin\s+/g, 'sin(')
+        .replace(/\bcosine\s+of\s+/g, 'cos(')
+        .replace(/\bcos\s+of\s+/g, 'cos(')
+        .replace(/\bcos\s+/g, 'cos(')
+        .replace(/\btangent\s+of\s+/g, 'tan(')
+        .replace(/\btan\s+of\s+/g, 'tan(')
+        .replace(/\btan\s+/g, 'tan(')
+        .replace(/\barcsine\s+of\s+/g, 'asin(')
+        .replace(/\barcsin\s+of\s+/g, 'asin(')
+        .replace(/\barccosine\s+of\s+/g, 'acos(')
+        .replace(/\barccos\s+of\s+/g, 'acos(')
+        .replace(/\barctangent\s+of\s+/g, 'atan(')
+        .replace(/\barctan\s+of\s+/g, 'atan(')
+        .replace(/\bnatural\s+log\s+of\s+/g, 'ln(')
+        .replace(/\bln\s+of\s+/g, 'ln(')
+        .replace(/\bln\s+/g, 'ln(')
+        .replace(/\blogarithm\s+of\s+/g, 'log(')
+        .replace(/\blog\s+of\s+/g, 'log(')
+        .replace(/\blog\s+/g, 'log(')
+        .replace(/\bexp(?:onent)?\s+of\s+/g, 'exp(')
+        .replace(/\bexp(?:onent)?\s+/g, 'exp(')
+        .replace(/\bpi\b/g, ' pi ')
+        .replace(/\be\b/g, ' e ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const openFuncs = ['sqrt(', 'cbrt(', 'abs(', 'round(', 'floor(', 'ceil(', 'sin(', 'cos(', 'tan(', 'asin(', 'acos(', 'atan(', 'ln(', 'log(', 'exp('];
+      for (const fn of openFuncs) {
+        const name = fn.slice(0, -1).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const opens = (text.match(new RegExp(name + '\\(', 'g')) || []).length;
+        const closes = (text.match(/\)/g) || []).length;
+        if (opens > closes) {
+          text += ')'.repeat(opens - closes);
+        }
+      }
+
+      return text;
+    }
+
+    
+    function evaluateMathExpression(query) {
+      const raw = normalizeMathQuery(query);
+      if (!raw) return null;
+
+      const letterCheck = raw
+        .replace(/\b(?:sqrt|cbrt|abs|round|floor|ceil|sin|cos|tan|asin|acos|atan|ln|log|exp|pi|e|math)\b/gi, '')
+        .replace(/\s+/g, '');
+
+      if (/[a-df-z]/i.test(letterCheck)) {
+        return null;
+      }
+
+      if (!/[0-9]|pi|e/i.test(raw)) {
+        return null;
+      }
+
+      if (/^e$/i.test(raw.trim())) {
+        return null;
+      }
+
+      let expression = raw
+        .replace(/,/g, '.')
+        .replace(/\^/g, '**')
+        .replace(/\bpi\b/gi, 'Math.PI')
+        .replace(/\be\b/gi, 'Math.E')
+        .replace(/\bsqrt\s*\(/gi, 'Math.sqrt(')
+        .replace(/\bcbrt\s*\(/gi, 'Math.cbrt(')
+        .replace(/\babs\s*\(/gi, 'Math.abs(')
+        .replace(/\bround\s*\(/gi, 'Math.round(')
+        .replace(/\bfloor\s*\(/gi, 'Math.floor(')
+        .replace(/\bceil\s*\(/gi, 'Math.ceil(')
+        .replace(/\bsin\s*\(/gi, 'Math.sin(')
+        .replace(/\bcos\s*\(/gi, 'Math.cos(')
+        .replace(/\btan\s*\(/gi, 'Math.tan(')
+        .replace(/\basin\s*\(/gi, 'Math.asin(')
+        .replace(/\bacos\s*\(/gi, 'Math.acos(')
+        .replace(/\batan\s*\(/gi, 'Math.atan(')
+        .replace(/\bln\s*\(/gi, 'Math.log(')
+        .replace(/\blog\s*\(/gi, 'Math.log10(')
+        .replace(/\bexp\s*\(/gi, 'Math.exp(')
+        .replace(/\s+/g, '');
+
+      expression = expression
+        .replace(/(\d)(Math\.)/g, '$1*$2')
+        .replace(/(\d)\(/g, '$1*(')
+        .replace(/\)(\d)/g, ')*$1')
+        .replace(/\)(Math\.)/g, ')*$1')
+        .replace(/(Math\.(?:PI|E))(\d)/g, '$1*$2')
+        .replace(/(Math\.(?:PI|E))\(/g, '$1*(');
+
+      const sanitized = expression
+        .replace(/Math\.(?:PI|E|sqrt|cbrt|abs|round|floor|ceil|sin|cos|tan|asin|acos|atan|log|log10|exp)/g, '1');
+
+      if (/[^0-9+\-*/%().]/.test(sanitized)) {
+        return null;
+      }
+
+      try {
+        const result = Function('"use strict"; return (' + expression + ');')();
+        if (typeof result !== 'number' || !Number.isFinite(result)) return null;
+        return result;
+      } catch (error) {
+        return null;
+      }
+    }
+
+
+    const currencyAliases = {
+      '$': 'USD',
+      'us$': 'USD',
+      'usd': 'USD',
+      'us dollar': 'USD',
+      'us dollars': 'USD',
+      'dollar': 'USD',
+      'dollars': 'USD',
+
+      '€': 'EUR',
+      'eur': 'EUR',
+      'euro': 'EUR',
+      'euros': 'EUR',
+
+      '£': 'GBP',
+      'gbp': 'GBP',
+      'pound': 'GBP',
+      'pounds': 'GBP',
+      'british pound': 'GBP',
+      'british pounds': 'GBP',
+      'pound sterling': 'GBP',
+      'pounds sterling': 'GBP',
+      'sterling': 'GBP',
+
+      '¥': 'JPY',
+      'jpy': 'JPY',
+      'yen': 'JPY',
+      'japanese yen': 'JPY',
+
+      'cny': 'CNY',
+      'yuan': 'CNY',
+      'renminbi': 'CNY',
+      'chinese yuan': 'CNY',
+      'rmb': 'CNY',
+
+      '₹': 'INR',
+      'inr': 'INR',
+      'rupee': 'INR',
+      'rupees': 'INR',
+      'indian rupee': 'INR',
+      'indian rupees': 'INR',
+
+      '₩': 'KRW',
+      'krw': 'KRW',
+      'won': 'KRW',
+      'south korean won': 'KRW',
+
+      '₽': 'RUB',
+      'rub': 'RUB',
+      'ruble': 'RUB',
+      'rubles': 'RUB',
+      'rouble': 'RUB',
+      'roubles': 'RUB',
+      'russian ruble': 'RUB',
+
+      '₺': 'TRY',
+      'try': 'TRY',
+      'turkish lira': 'TRY',
+      'lira': 'TRY',
+
+      '₫': 'VND',
+      'vnd': 'VND',
+      'dong': 'VND',
+      'vietnamese dong': 'VND',
+
+      '฿': 'THB',
+      'thb': 'THB',
+      'baht': 'THB',
+      'thai baht': 'THB',
+
+      '₴': 'UAH',
+      'uah': 'UAH',
+      'hryvnia': 'UAH',
+      'ukrainian hryvnia': 'UAH',
+
+      '₦': 'NGN',
+      'ngn': 'NGN',
+      'naira': 'NGN',
+      'nigerian naira': 'NGN',
+
+      '₪': 'ILS',
+      'ils': 'ILS',
+      'shekel': 'ILS',
+      'shekels': 'ILS',
+      'new shekel': 'ILS',
+      'new shekels': 'ILS',
+      'israeli shekel': 'ILS',
+
+      '₱': 'PHP',
+      'php': 'PHP',
+      'philippine peso': 'PHP',
+      'philippine pesos': 'PHP',
+      'peso': 'PHP',
+      'pesos': 'PHP',
+
+      'R$': 'BRL',
+      'brl': 'BRL',
+      'real': 'BRL',
+      'reals': 'BRL',
+      'brazilian real': 'BRL',
+      'brazilian reals': 'BRL',
+
+      'A$': 'AUD',
+      'aud': 'AUD',
+      'australian dollar': 'AUD',
+      'australian dollars': 'AUD',
+
+      'C$': 'CAD',
+      'cad': 'CAD',
+      'canadian dollar': 'CAD',
+      'canadian dollars': 'CAD',
+
+      'NZ$': 'NZD',
+      'nzd': 'NZD',
+      'new zealand dollar': 'NZD',
+      'new zealand dollars': 'NZD',
+
+      'HK$': 'HKD',
+      'hkd': 'HKD',
+      'hong kong dollar': 'HKD',
+      'hong kong dollars': 'HKD',
+
+      'S$': 'SGD',
+      'sgd': 'SGD',
+      'singapore dollar': 'SGD',
+      'singapore dollars': 'SGD',
+
+      'NT$': 'TWD',
+      'twd': 'TWD',
+      'new taiwan dollar': 'TWD',
+      'new taiwan dollars': 'TWD',
+
+      'mxn': 'MXN',
+      'mexican peso': 'MXN',
+      'mexican pesos': 'MXN',
+
+      'jmd': 'JMD',
+      'jamaican dollar': 'JMD',
+      'jamaican dollars': 'JMD',
+
+      'sek': 'SEK',
+      'swedish krona': 'SEK',
+      'swedish kronor': 'SEK',
+      'swedish krone': 'SEK',
+      'swedish krones': 'SEK',
+      'svenska kronor': 'SEK',
+      'svensk krone': 'SEK',
+
+      'dkk': 'DKK',
+      'kr': 'DKK',
+      'danish krone': 'DKK',
+      'danish kroner': 'DKK',
+
+      'nok': 'NOK',
+      'norwegian krone': 'NOK',
+      'norwegian kroner': 'NOK',
+      'norwegian krones': 'NOK',
+      'norwegian crown': 'NOK',
+      'norwegian crowns': 'NOK',
+      'norske kroner': 'NOK',
+      'norsk krone': 'NOK',
+
+      'isk': 'ISK',
+      'icelandic krona': 'ISK',
+      'icelandic kronur': 'ISK',
+
+      'chf': 'CHF',
+      'swiss franc': 'CHF',
+      'swiss francs': 'CHF',
+      'franc': 'CHF',
+      'francs': 'CHF',
+
+      'pln': 'PLN',
+      'zloty': 'PLN',
+      'zlotys': 'PLN',
+      'polish zloty': 'PLN',
+
+      'czk': 'CZK',
+      'czech koruna': 'CZK',
+      'czech koruny': 'CZK',
+
+      'huf': 'HUF',
+      'forint': 'HUF',
+      'hungarian forint': 'HUF',
+
+      'ron': 'RON',
+      'romanian leu': 'RON',
+      'romanian lei': 'RON',
+
+      'bgn': 'BGN',
+      'bulgarian lev': 'BGN',
+      'bulgarian leva': 'BGN',
+
+      'zar': 'ZAR',
+      'rand': 'ZAR',
+      'south african rand': 'ZAR',
+
+      'aed': 'AED',
+      'dirham': 'AED',
+      'dirhams': 'AED',
+      'uae dirham': 'AED',
+      'emirati dirham': 'AED',
+
+      'sar': 'SAR',
+      'saudi riyal': 'SAR',
+      'saudi riyals': 'SAR',
+      'riyal': 'SAR',
+      'riyals': 'SAR',
+
+      'qar': 'QAR',
+      'qatari riyal': 'QAR',
+      'qatari riyals': 'QAR',
+
+      'kwd': 'KWD',
+      'kuwaiti dinar': 'KWD',
+
+      'bhd': 'BHD',
+      'bahraini dinar': 'BHD',
+
+      'omr': 'OMR',
+      'omani rial': 'OMR',
+
+      'egp': 'EGP',
+      'egyptian pound': 'EGP',
+      'egyptian pounds': 'EGP',
+
+      'mad': 'MAD',
+      'moroccan dirham': 'MAD',
+      'moroccan dirhams': 'MAD',
+
+      'ars': 'ARS',
+      'argentine peso': 'ARS',
+      'argentine pesos': 'ARS',
+
+      'clp': 'CLP',
+      'chilean peso': 'CLP',
+      'chilean pesos': 'CLP',
+
+      'cop': 'COP',
+      'colombian peso': 'COP',
+      'colombian pesos': 'COP',
+
+      'pen': 'PEN',
+      'peruvian sol': 'PEN',
+      'peruvian soles': 'PEN',
+      'sol': 'PEN',
+      'soles': 'PEN',
+
+      'uyu': 'UYU',
+      'uruguayan peso': 'UYU',
+      'uruguayan pesos': 'UYU',
+
+      'bob': 'BOB',
+      'bolivian boliviano': 'BOB',
+      'boliviano': 'BOB',
+      'bolivianos': 'BOB',
+
+      'crc': 'CRC',
+      'costa rican colon': 'CRC',
+      'costa rican colones': 'CRC',
+      'colon': 'CRC',
+      'colones': 'CRC',
+
+      'dop': 'DOP',
+      'dominican peso': 'DOP',
+      'dominican pesos': 'DOP',
+
+      'idr': 'IDR',
+      'indonesian rupiah': 'IDR',
+      'rupiah': 'IDR',
+
+      'myr': 'MYR',
+      'malaysian ringgit': 'MYR',
+      'ringgit': 'MYR',
+
+      'pkr': 'PKR',
+      'pakistani rupee': 'PKR',
+      'pakistani rupees': 'PKR',
+
+      'bdt': 'BDT',
+      'bangladeshi taka': 'BDT',
+      'taka': 'BDT',
+
+      'lkr': 'LKR',
+      'sri lankan rupee': 'LKR',
+      'sri lankan rupees': 'LKR',
+
+      'npr': 'NPR',
+      'nepalese rupee': 'NPR',
+      'nepalese rupees': 'NPR',
+
+      'kes': 'KES',
+      'kenyan shilling': 'KES',
+      'kenyan shillings': 'KES',
+      'shilling': 'KES',
+      'shillings': 'KES',
+
+      'tzs': 'TZS',
+      'tanzanian shilling': 'TZS',
+      'tanzanian shillings': 'TZS',
+
+      'ugx': 'UGX',
+      'ugandan shilling': 'UGX',
+      'ugandan shillings': 'UGX',
+
+      'ghs': 'GHS',
+      'ghanaian cedi': 'GHS',
+      'cedi': 'GHS',
+      'cedis': 'GHS',
+
+      'btc': 'BTC',
+      'bitcoin': 'BTC',
+      'bitcoins': 'BTC',
+
+      'eth': 'ETH',
+      'ethereum': 'ETH'
+    };
+
+    const currencyAliasEntries = Object.entries(currencyAliases)
+      .sort((a, b) => b[0].length - a[0].length)
+      .map(([alias, code]) => {
+        const hasLetters = /[a-z]/i.test(alias);
+        const pattern = hasLetters
+          ? new RegExp('\\b' + alias.split(/\s+/).map(escapeRegExp).join('\\s+') + '\\b', 'gi')
+          : new RegExp(escapeRegExp(alias), 'g');
+        return { alias, code, pattern };
+      });
+
+    function escapeRegExp(value) {
+      return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function parseFlexibleNumber(value) {
+      const raw = String(value || '').trim().replace(/\s+/g, '');
+      if (!raw) return NaN;
+
+      const hasDot = raw.includes('.');
+      const hasComma = raw.includes(',');
+
+      if (hasDot && hasComma) {
+        if (raw.lastIndexOf(',') > raw.lastIndexOf('.')) {
+          return Number(raw.replace(/\./g, '').replace(',', '.'));
+        }
+        return Number(raw.replace(/,/g, ''));
+      }
+
+      if (hasComma) {
+        const parts = raw.split(',');
+        if (parts.length === 2 && parts[1].length <= 2) {
+          return Number(raw.replace(',', '.'));
+        }
+        return Number(raw.replace(/,/g, ''));
+      }
+
+      return Number(raw);
+    }
+
+    function extractCurrencyMentions(query) {
+      const text = String(query || '').toLowerCase();
+      const matches = [];
+
+      for (const entry of currencyAliasEntries) {
+        entry.pattern.lastIndex = 0;
+        let match;
+        while ((match = entry.pattern.exec(text)) !== null) {
+          matches.push({
+            start: match.index,
+            end: match.index + match[0].length,
+            code: entry.code,
+            alias: entry.alias
+          });
+          if (!match[0].length) {
+            entry.pattern.lastIndex += 1;
+          }
+        }
+      }
+
+      matches.sort((a, b) => {
+        if (a.start !== b.start) return a.start - b.start;
+        return (b.end - b.start) - (a.end - a.start);
+      });
+
+      const filtered = [];
+      for (const match of matches) {
+        const overlaps = filtered.some((kept) => !(match.end <= kept.start || match.start >= kept.end));
+        if (!overlaps) {
+          filtered.push(match);
+        }
+      }
+
+      return filtered;
+    }
+
+
+
+    function stripQuickPrefixes(query) {
+      return String(query || '')
+        .trim()
+        .replace(/^\s*(?:what\s+is|what's|whats|hvad\s+er)\s+/i, '')
+        .trim();
+    }
+
+    function shouldKeepSuggestionsAlongsideQuickResult(query, detected) {
+      if (!detected || detected.kind === 'none') {
+        return false;
+      }
+
+      const trimmed = stripQuickPrefixes(query).trim().toLowerCase();
+      return detected.kind === 'math' && trimmed === 'pi';
+    }
+
+    function detectQuickResultQuery(query) {
+      const trimmed = stripQuickPrefixes(query);
+      if (!trimmed || currentMode !== 'search') {
+        return { kind: 'none' };
+      }
+
+      const timezoneLocation = parseTimezoneLookup(query);
+      if (timezoneLocation) {
+        return { kind: 'timezone', location: timezoneLocation };
+      }
+
+      const amountMatch = trimmed.match(/-?\d(?:[\d.,\s]*\d)?(?:[.,]\d+)?|-?\d/);
+      const amount = amountMatch ? parseFlexibleNumber(amountMatch[0]) : NaN;
+      const mentions = extractCurrencyMentions(trimmed);
+      const uniqueCodes = [];
+
+      for (const mention of mentions) {
+        if (!uniqueCodes.includes(mention.code)) {
+          uniqueCodes.push(mention.code);
+        }
+      }
+
+      if (Number.isFinite(amount) && uniqueCodes.length >= 2 && uniqueCodes[0] !== uniqueCodes[1]) {
+        return {
+          kind: 'currency',
+          amount,
+          from: uniqueCodes[0],
+          to: uniqueCodes[1]
+        };
+      }
+
+      const unitMentions = extractUnitMentions(trimmed);
+      const uniqueUnits = [];
+      for (const mention of unitMentions) {
+        if (!uniqueUnits.includes(mention.key)) uniqueUnits.push(mention.key);
+      }
+
+      if (Number.isFinite(amount) && uniqueUnits.length >= 2) {
+        const fromUnit = unitDefinitions[uniqueUnits[0]];
+        const toUnit = unitDefinitions[uniqueUnits[1]];
+        if (fromUnit && toUnit && fromUnit.category === toUnit.category && uniqueUnits[0] !== uniqueUnits[1]) {
+          return {
+            kind: 'unit',
+            amount,
+            from: uniqueUnits[0],
+            to: uniqueUnits[1]
+          };
+        }
+      }
+
+      const mathResult = evaluateMathExpression(trimmed);
+      if (mathResult !== null) {
+        return { kind: 'math', result: mathResult };
+      }
+
+      return { kind: 'none' };
+    }
+
+    async function fetchRate(from, to) {
+      const key = `${from}_${to}`;
+      const inverseKey = `${to}_${from}`;
+      const now = Date.now();
+      const shortTtl = 1000 * 60 * 60;
+
+      if (from === to) {
+        return 1;
+      }
+
+      const cached = fxCache.get(key);
+      if (cached && now - cached.time < shortTtl) {
+        return cached.rate;
+      }
+
+      const inverse = fxCache.get(inverseKey);
+      if (inverse && now - inverse.time < shortTtl && typeof inverse.rate === 'number' && inverse.rate !== 0) {
+        const derived = 1 / inverse.rate;
+        fxCache.set(key, { rate: derived, time: now });
+        return derived;
+      }
+
+      const baseCached = fxBaseCache.get(from);
+      if (baseCached && now < baseCached.expiresAt && baseCached.rates && typeof baseCached.rates[to] === 'number') {
+        const rate = baseCached.rates[to];
+        fxCache.set(key, { rate, time: now });
+        if (rate !== 0) {
+          fxCache.set(inverseKey, { rate: 1 / rate, time: now });
+        }
+        return rate;
+      }
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 1200);
+
+      try {
+        const response = await fetch(
+          'https://open.er-api.com/v6/latest/' + encodeURIComponent(from),
+          {
+            method: 'GET',
+            mode: 'cors',
+            credentials: 'omit',
+            signal: controller.signal,
+            cache: 'force-cache'
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Conversion request failed');
+        }
+
+        const data = await response.json();
+        if (!data || data.result !== 'success' || !data.rates) {
+          throw new Error('Conversion request failed');
+        }
+
+        const nextUpdateMs = typeof data.time_next_update_unix === 'number'
+          ? data.time_next_update_unix * 1000
+          : now + 1000 * 60 * 60 * 24;
+
+        fxBaseCache.set(from, {
+          rates: data.rates,
+          expiresAt: nextUpdateMs
+        });
+
+        const rate = typeof data.rates[to] === 'number' ? data.rates[to] : null;
+        if (typeof rate === 'number') {
+          fxCache.set(key, { rate, time: now });
+          if (rate !== 0) {
+            fxCache.set(inverseKey, { rate: 1 / rate, time: now });
+          }
+        }
+
+        return rate;
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+
+    async function updateQuickResult(query) {
+      const token = ++quickResultToken;
+      const detected = detectQuickResultQuery(query);
+
+      if (detected.kind === 'none') {
+        hideQuickResult();
+        return detected;
+      }
+
+      if (detected.kind === 'math') {
+        const text = formatResultNumber(detected.result);
+        showQuickResult('Calculator', text, { copyText: text });
+        return detected;
+      }
+
+      if (detected.kind === 'currency' && Number.isFinite(detected.amount)) {
+        showQuickResult('Converter', 'Loading…');
+        try {
+          const rate = await fetchRate(detected.from, detected.to);
+          if (token !== quickResultToken) return detected;
+          if (typeof rate === 'number') {
+            const converted = detected.amount * rate;
+            const text = formatResultNumber(detected.amount) + ' ' + detected.from + ' = ' + formatResultNumber(converted) + ' ' + detected.to;
+            showQuickResult('Converter', text, { copyText: text });
+            return detected;
+          }
+        } catch (error) {
+          if (token === quickResultToken) showQuickResult('Converter', 'Could not load conversion');
+        }
+      }
+
+      if (detected.kind === 'unit' && Number.isFinite(detected.amount)) {
+        const converted = convertUnitValue(detected.amount, detected.from, detected.to);
+        if (token !== quickResultToken) return detected;
+        if (typeof converted === 'number' && Number.isFinite(converted)) {
+          const text = formatUnitResult(detected.amount, detected.from) + ' = ' + formatUnitResult(converted, detected.to);
+          showQuickResult('Unit Converter', text, { copyText: text });
+          return detected;
+        }
+      }
+
+      if (detected.kind === 'timezone' && detected.location) {
+        showQuickResult('Time zone', 'Loading…');
+        try {
+          const place = await fetchTimezoneLocation(detected.location);
+          if (token !== quickResultToken) return detected;
+          const formatted = formatTimezoneQuickResult(place);
+          if (formatted) {
+            showQuickResult(formatted.label || 'Time zone', formatted.value, { copyText: formatted.value });
+            return detected;
+          }
+          showQuickResult('Time zone', 'No location found');
+          return detected;
+        } catch (error) {
+          if (token === quickResultToken) showQuickResult('Time zone', 'Could not load time');
+        }
+      }
+
+      return detected;
+    }
+
+    function jsonpRequest(url) {
+      return new Promise((resolve, reject) => {
+        const callbackName = `suggestCallback_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+        const script = document.createElement('script');
+        const timeout = setTimeout(() => {
+          cleanup();
+          reject(new Error('Suggestion request timed out'));
+        }, 2500);
+
+        function cleanup() {
+          clearTimeout(timeout);
+          delete window[callbackName];
+          script.remove();
+        }
+
+        window[callbackName] = (data) => {
+          cleanup();
+          resolve(data);
+        };
+
+        script.onerror = () => {
+          cleanup();
+          reject(new Error('Suggestion request failed'));
+        };
+
+        script.src = `${url}&callback=${callbackName}`;
+        document.body.appendChild(script);
+      });
+    }
+
+    async function fetchJson(url) {
+      const response = await fetch(url, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'omit'
+      });
+
+      if (!response.ok) {
+        throw new Error('Suggestion request failed');
+      }
+
+      return response.json();
+    }
+
+    async function fetchSuggestions(query) {
+      const requestToken = ++suggestionRequestToken;
+
+      if (currentMode !== 'search') {
+        hideSuggestions();
+        return;
+      }
+
+      const selectedEngine = searchEngines[currentEngine] || searchEngines.google;
+
+      const canRender = () =>
+        requestToken === suggestionRequestToken &&
+        currentMode === 'search' &&
+        input.value.trim().toLowerCase() === query.toLowerCase() &&
+        query.length > 0;
+      const queryLower = query.toLowerCase();
+
+      try {
+        if (selectedEngine.suggest) {
+          const data = await selectedEngine.suggest(queryLower);
+          const liveSuggestions = selectedEngine.parseSuggestions ? selectedEngine.parseSuggestions(data) : [];
+
+          if (liveSuggestions.length && canRender()) {
+            renderSuggestions(liveSuggestions);
+            return;
+          }
+        }
+      } catch (error) {
+      }
+
+      try {
+        const googleData = await searchEngines.google.suggest(queryLower);
+        const googleSuggestions = searchEngines.google.parseSuggestions(googleData);
+
+        if (googleSuggestions.length && canRender()) {
+          renderSuggestions(googleSuggestions);
+          return;
+        }
+      } catch (error) {
+      }
+
+      if (!canRender()) {
+        return;
+      }
+
+      const filtered = fallbackSuggestions.filter((item) =>
+        item.toLowerCase().includes(query.toLowerCase())
+      );
+      renderSuggestions(filtered);
+    }
+
+    input.addEventListener('input', () => {
+      const query = input.value.trim();
+
+      clearTimeout(debounceTimer);
+
+      if (currentMode !== 'search') {
+        suggestionRequestToken++;
+        hideSuggestions();
+        hideQuickResult();
+        return;
+      }
+
+      if (!query) {
+        suggestionRequestToken++;
+        hideSuggestions();
+        hideQuickResult();
+        return;
+      }
+
+      const detected = detectQuickResultQuery(query);
+      updateQuickResult(query);
+
+      if (detected.kind !== 'none' && !shouldKeepSuggestionsAlongsideQuickResult(query, detected)) {
+        hideSuggestions();
+        return;
+      }
+
+      debounceTimer = setTimeout(() => {
+        fetchSuggestions(query);
+      }, 120);
+    });
+
+    input.addEventListener('select', () => {
+      const query = input.value.trim();
+
+      if (!query || currentMode !== 'search') {
+        return;
+      }
+
+      const detected = detectQuickResultQuery(query);
+      if (detected.kind !== 'none') {
+        return;
+      }
+
+      if (!suggestions.classList.contains('visible')) {
+        fetchSuggestions(query);
+      }
+    });
+
+
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        if (currentMode === 'chatgpt') {
+          openSelectedAIWithPrompt(input.value);
+        } else if (activeIndex >= 0 && currentSuggestions.length) {
+          input.value = currentSuggestions[activeIndex];
+          performSearch(input.value);
+        } else {
+          performSearch(input.value);
+        }
+        return;
+      }
+
+      if (!currentSuggestions.length || currentMode !== 'search') return;
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        activeIndex = (activeIndex + 1) % currentSuggestions.length;
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        activeIndex = (activeIndex - 1 + currentSuggestions.length) % currentSuggestions.length;
+      } else if (event.key === 'Escape') {
+        hideSuggestions();
+        hideQuickResult();
+        return;
+      } else {
+        return;
+      }
+
+      [...suggestions.children].forEach((item, index) => {
+        item.classList.toggle('active', index === activeIndex);
+      });
+    });
+
+    suggestions.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+      const item = event.target.closest('.suggestion-item');
+      if (!item) return;
+
+      const chosen = currentSuggestions[Number(item.dataset.index)] || input.value;
+      input.value = chosen;
+      performSearch(chosen);
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('.search-wrap')) {
+        hideSuggestions();
+      }
+
+      if (!event.target.closest('.engine-picker')) {
+        hideEngineMenu();
+      }
+
+      if (!event.target.closest('.ai-picker')) {
+        hideAIMenu();
+      }
+
+      if (!event.target.closest('.settings-switcher')) {
+        hideSettingsMenu();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.ctrlKey && event.code === 'Space') {
+        const now = Date.now();
+        if (event.repeat || now < toggleLockedUntil) {
+          event.preventDefault();
+          return;
+        }
+        toggleLockedUntil = now + 220;
+        event.preventDefault();
+        toggleMode();
+      }
+    });
+
+    quickResultCopy.addEventListener('click', async (event) => {
+      event.preventDefault();
+      if (!currentQuickCopyText) return;
+      const copied = await copyTextToClipboard(currentQuickCopyText);
+      if (copied) {
+        playUISound('copy');
+        quickResultCopy.classList.add('is-copied');
+        showCopyToast('Quick result copied');
+        clearTimeout(quickCopyPulseTimer);
+        quickCopyPulseTimer = setTimeout(() => {
+          quickResultCopy.classList.remove('is-copied');
+        }, 180);
+      }
+    });
+
+    engineTrigger.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (engineMenu.classList.contains('visible')) {
+        hideEngineMenu();
+      } else {
+        showEngineMenu();
+      }
+    });
+
+    engineMenu.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+      const option = event.target.closest('.engine-option');
+      if (!option) return;
+
+      setEngine(option.dataset.engine);
+      hideEngineMenu();
+
+      const query = input.value.trim();
+      if (query) {
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      } else {
+        hideSuggestions();
+        hideQuickResult();
+      }
+    });
+
+    function focusSearchInput(selectAll = true) {
+      requestAnimationFrame(() => {
+        input.focus({ preventScroll: true });
+        if (selectAll) {
+          input.select();
+        } else {
+          const end = input.value.length;
+          input.setSelectionRange(end, end);
+        }
+      });
+    }
+
+    function routeTypingToSearch(event) {
+      if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+      }
+
+      const target = event.target;
+      const isEditable =
+        target instanceof HTMLElement &&
+        (
+          target === input ||
+          target.tagName === 'TEXTAREA' ||
+          (target.tagName === 'INPUT' && target !== engineTrigger) ||
+          target.isContentEditable
+        );
+
+      if (isEditable) {
+        return;
+      }
+
+      const isPrintable = event.key.length === 1;
+      const isBackspace = event.key === 'Backspace';
+
+      if (!isPrintable && !isBackspace) {
+        return;
+      }
+
+      event.preventDefault();
+      focusSearchInput(false);
+
+      if (isPrintable) {
+        const start = input.selectionStart ?? input.value.length;
+        const end = input.selectionEnd ?? input.value.length;
+        input.setRangeText(event.key, start, end, 'end');
+      } else if (isBackspace) {
+        const start = input.selectionStart ?? input.value.length;
+        const end = input.selectionEnd ?? input.value.length;
+        if (start !== end) {
+          input.setRangeText('', start, end, 'end');
+        } else if (start > 0) {
+          input.setRangeText('', start - 1, start, 'end');
+        }
+      }
+
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+
+    aiTrigger.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (aiMenu.classList.contains('visible')) {
+        hideAIMenu();
+      } else {
+        showAIMenu();
+      }
+    });
+
+    aiMenu.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+      const option = event.target.closest('.ai-option');
+      if (!option) return;
+
+      setAIProvider(option.dataset.ai);
+      hideAIMenu();
+    });
+
+
+
+    resetSearchBarLighting();
+
+    form.addEventListener('mouseenter', () => {
+      form.classList.remove('is-pressed');
+    });
+    form.addEventListener('mouseleave', () => {
+      form.classList.remove('is-pressed');
+    });
+    form.addEventListener('mousedown', (event) => {
+      const clickedInput = event.target === input || event.target.closest('.search-input');
+      if (clickedInput && document.activeElement !== input) {
+        form.classList.add('is-pressed');
+      } else {
+        form.classList.remove('is-pressed');
+      }
+    });
+    window.addEventListener('mouseup', () => {
+      form.classList.remove('is-pressed');
+    });
+    form.addEventListener('focusin', () => {
+      form.classList.remove('is-pressed');
+    });
+
+    modeToggleBtn.addEventListener('click', async (event) => {
+      event.preventDefault();
+      await unlockUIAudio();
+      playUISound('mode');
+      toggleMode();
+    });
+
+    buildWallpaperMenu();
+    try {
+      setWallpaper(localStorage.getItem('heliumWallpaper') || wallpapers[0].key);
+    } catch (error) {
+      setWallpaper(wallpapers[0].key);
+    }
+    applyClockDateVisibility();
+
+    settingsTrigger.addEventListener('click', async (event) => {
+      event.stopPropagation();
+      await unlockUIAudio();
+      playUISound('soft');
+      animateSettingsTriggerButton();
+      if (settingsMenu.classList.contains('visible')) {
+        hideSettingsMenu();
+      } else {
+        showSettingsMenu();
+      }
+    });
+
+    wallpaperSettingsItem.addEventListener('mousedown', async (event) => {
+      event.preventDefault();
+      await unlockUIAudio();
+      playUISound('tap');
+      if (wallpaperSubmenu.classList.contains('visible')) {
+        hideWallpaperSubmenu();
+      } else {
+        showWallpaperSubmenu();
+      }
+    });
+
+    wallpaperSubmenu.addEventListener('mousedown', async (event) => {
+      event.preventDefault();
+      const option = event.target.closest('.wallpaper-subitem');
+      if (!option) return;
+      await unlockUIAudio();
+      playUISound('tap');
+      setWallpaper(option.dataset.wallpaper);
+      hideSettingsMenu();
+    });
+
+    clockToggleItem.addEventListener('mousedown', async (event) => {
+      event.preventDefault();
+      await unlockUIAudio();
+      playUISound('tap');
+      setClockVisibility(!clockToggleItem.classList.contains('is-on'));
+    });
+
+    dateToggleItem.addEventListener('mousedown', async (event) => {
+      event.preventDefault();
+      await unlockUIAudio();
+      playUISound('tap');
+      setDateVisibility(!dateToggleItem.classList.contains('is-on'));
+    });
+
+    weatherToggleItem.addEventListener('mousedown', async (event) => {
+      event.preventDefault();
+      await unlockUIAudio();
+      playUISound('tap');
+      setWeatherVisibility(!weatherToggleItem.classList.contains('is-on'));
+    });
+
+    soundToggleItem.addEventListener('mousedown', async (event) => {
+      event.preventDefault();
+      const nextEnabled = !soundToggleItem.classList.contains('is-on');
+      if (nextEnabled) {
+        await unlockUIAudio();
+      }
+      setSoundEnabled(nextEnabled);
+      if (nextEnabled) {
+        playUISound('soft');
+      }
+    });
+
+    document.addEventListener('pointerdown', () => {
+      unlockUIAudio();
+    }, { passive: true, once: true });
+
+    document.addEventListener('keydown', () => {
+      unlockUIAudio();
+    }, { passive: true, once: true });
+
+    buildAmbientParticles();
+    updateWallpaperSubmenuPosition();
+    window.addEventListener('resize', updateWallpaperSubmenuPosition);
+    buildEngineMenu();
+    buildAIMenu();
+    setEngine(currentEngine);
+    setAIProvider(currentAI);
+    updateModeUI(false);
+    refreshWeatherLine();
+    setInterval(refreshWeatherLine, 1000 * 60 * 20);
+    focusSearchInput();
+    setTimeout(() => focusSearchInput(), 120);
+    setTimeout(() => focusSearchInput(), 320);
+    setTimeout(() => focusSearchInput(), 620);
+
+    let initialFocusTries = 0;
+    const initialFocusAssist = setInterval(() => {
+      initialFocusTries += 1;
+      if (document.activeElement === input || initialFocusTries > 8) {
+        clearInterval(initialFocusAssist);
+        return;
+      }
+      focusSearchInput(false);
+    }, 160);
+
+    window.addEventListener('pageshow', () => {
+      focusSearchInput();
+      refreshWeatherLine();
+    });
+    window.addEventListener('focus', () => {
+      focusSearchInput();
+      refreshWeatherLine();
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        focusSearchInput();
+        refreshWeatherLine();
+      }
+    });
+
+    document.addEventListener('wheel', (event) => {
+      if (event.ctrlKey || event.metaKey) {
+        event.preventDefault();
+      }
+    }, { passive: false });
+
+    document.addEventListener('keydown', (event) => {
+      if ((event.ctrlKey || event.metaKey) && ['+', '=', '-', '_', '0'].includes(event.key)) {
+        event.preventDefault();
+      }
+    }, true);
+
+    document.addEventListener('gesturestart', (event) => {
+      event.preventDefault();
+    });
+
+    document.addEventListener('gesturechange', (event) => {
+      event.preventDefault();
+    });
+
+    document.addEventListener('gestureend', (event) => {
+      event.preventDefault();
+    });
+    document.addEventListener('keydown', routeTypingToSearch, true);
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (currentMode === 'chatgpt') {
+        openSelectedAIWithPrompt(input.value);
+      } else {
+        performSearch(input.value);
+      }
+    });
+  </script>
+
+
+</body>
+</html>
