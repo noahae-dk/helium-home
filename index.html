@@ -4007,12 +4007,12 @@
     let initialFocusTries = 0;
     const initialFocusAssist = setInterval(() => {
       initialFocusTries += 1;
-      if (document.activeElement === input || initialFocusTries > 8) {
+      if (document.activeElement === input || initialFocusTries > 30) {
         clearInterval(initialFocusAssist);
         return;
       }
       focusSearchInput(false);
-    }, 160);
+    }, 100);
 
     window.addEventListener('pageshow', () => {
       focusSearchInput();
@@ -4053,6 +4053,12 @@
       event.preventDefault();
     });
     document.addEventListener('keydown', routeTypingToSearch, true);
+
+    document.addEventListener('click', (event) => {
+      if (!form.contains(event.target)) {
+        focusSearchInput(false);
+      }
+    });
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
