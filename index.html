@@ -3842,6 +3842,15 @@
 
       if (!currentSuggestions.length || currentMode !== 'search') return;
 
+      if (event.key === 'Tab') {
+        if (activeIndex >= 0 && currentSuggestions[activeIndex]) {
+          event.preventDefault();
+          input.value = currentSuggestions[activeIndex];
+          hideSuggestions();
+        }
+        return;
+      }
+
       if (event.key === 'ArrowDown') {
         event.preventDefault();
         activeIndex = (activeIndex + 1) % currentSuggestions.length;
@@ -3859,6 +3868,18 @@
       [...suggestions.children].forEach((item, index) => {
         item.classList.toggle('active', index === activeIndex);
       });
+    });
+
+    suggestions.addEventListener('mouseover', (event) => {
+      const item = event.target.closest('.suggestion-item');
+      if (!item) return;
+      activeIndex = Number(item.dataset.index);
+      [...suggestions.children].forEach((el, i) => el.classList.toggle('active', i === activeIndex));
+    });
+
+    suggestions.addEventListener('mouseleave', () => {
+      activeIndex = -1;
+      [...suggestions.children].forEach(el => el.classList.remove('active'));
     });
 
     suggestions.addEventListener('mousedown', (event) => {
@@ -4772,6 +4793,7 @@
       '#clockToggleItem',
       '#dateToggleItem',
       '#weatherToggleItem',
+      '.suggestion-item',
       '.engine-option',
       '.ai-option',
       '.wallpaper-subitem',
