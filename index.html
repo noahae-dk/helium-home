@@ -562,9 +562,6 @@
     }
 
     .engine-trigger.active {
-      width: var(--engine-trigger-expanded-width, 132px);
-      padding: 0 11px 0 9px;
-      gap: 7px;
     }
 
     .engine-trigger:active { transform: scale(0.985); }
@@ -579,6 +576,7 @@
     }
 
     .engine-label {
+      display: none;
       font-size: 0.95rem;
       line-height: 1.22;
       white-space: nowrap;
@@ -885,9 +883,6 @@
     }
 
     .ai-trigger.active {
-      width: var(--ai-trigger-expanded-width, 138px);
-      padding: 0 11px 0 9px;
-      gap: 7px;
     }
 
     .ai-trigger:active {
@@ -904,6 +899,7 @@
     }
 
     .ai-label {
+      display: none;
       font-size: 0.95rem;
       line-height: 1.22;
       white-space: nowrap;
@@ -1472,7 +1468,6 @@
           autocorrect="on"
           autocapitalize="off"
           lang="en"
-          autofocus
         />
         <div class="engine-picker" id="enginePicker">
           <button class="engine-trigger" id="engineTrigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Choose search engine">
@@ -3999,32 +3994,14 @@
     updateModeUI(false);
     refreshWeatherLine();
     setInterval(refreshWeatherLine, 1000 * 60 * 20);
-    focusSearchInput();
-    setTimeout(() => focusSearchInput(), 120);
-    setTimeout(() => focusSearchInput(), 320);
-    setTimeout(() => focusSearchInput(), 620);
-
-    let initialFocusTries = 0;
-    const initialFocusAssist = setInterval(() => {
-      initialFocusTries += 1;
-      if (document.activeElement === input || initialFocusTries > 30) {
-        clearInterval(initialFocusAssist);
-        return;
-      }
-      focusSearchInput(false);
-    }, 100);
-
     window.addEventListener('pageshow', () => {
-      focusSearchInput();
       refreshWeatherLine();
     });
     window.addEventListener('focus', () => {
-      focusSearchInput();
       refreshWeatherLine();
     });
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
-        focusSearchInput();
         refreshWeatherLine();
       }
     });
@@ -4051,13 +4028,6 @@
 
     document.addEventListener('gestureend', (event) => {
       event.preventDefault();
-    });
-    document.addEventListener('keydown', routeTypingToSearch, true);
-
-    document.addEventListener('click', (event) => {
-      if (!form.contains(event.target)) {
-        focusSearchInput(false);
-      }
     });
 
     form.addEventListener('submit', (event) => {
