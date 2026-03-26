@@ -2337,7 +2337,7 @@
       const cached = helperCache.get('__weatherFallback');
       if (cached) return cached;
       const response = await fetch(
-        'https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(defaultWeatherLocation) + '&count=1&language=en&format=json',
+        'https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(fixedWeatherLocationLabel) + '&count=1&language=en&format=json',
         { method: 'GET', mode: 'cors', credentials: 'omit', cache: 'force-cache' }
       );
       if (!response.ok) throw new Error('Weather fallback lookup failed');
