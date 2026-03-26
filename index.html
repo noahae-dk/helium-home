@@ -89,6 +89,7 @@
             user-select: none;
       line-height: 1;
       margin-bottom: 8px;
+      transition: filter 0.22s ease, opacity 0.22s ease;
     }
 
     .date {
@@ -97,6 +98,13 @@
       letter-spacing: 0.02em;
             user-select: none;
       color: rgba(255, 255, 255, 0.92);
+      transition: filter 0.22s ease, opacity 0.22s ease;
+    }
+
+    .clock.josh-blur,
+    .date.josh-blur {
+      filter: blur(8px);
+      opacity: 0;
     }
 
     .weather-line {
@@ -1785,6 +1793,11 @@
     const danishMonths = ['Januar', 'Februar', 'Marts', 'April', 'Maj', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'December'];
     const englishDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const englishMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    function ordinalSuffix(d) {
+      if (d >= 11 && d <= 13) return d + 'th';
+      const s = ['th','st','nd','rd'];
+      return d + (s[d % 10] || 'th');
+    }
 
     function updateDateTime() {
       const now = new Date();
@@ -1798,7 +1811,7 @@
 
       clock.textContent = time;
       if (josh) {
-        dateElement.textContent = `${englishDays[now.getDay()]}, ${now.getDate()}, ${englishMonths[now.getMonth()]}`;
+        dateElement.textContent = `${englishDays[now.getDay()]}, ${englishMonths[now.getMonth()]} ${ordinalSuffix(now.getDate())}`;
       } else {
         dateElement.textContent = `${danishDays[now.getDay()]}, ${now.getDate()}, ${danishMonths[now.getMonth()]}`;
       }
@@ -2013,10 +2026,17 @@
     }
 
     function setJoshMode(isEnabled) {
-      try {
-        localStorage.setItem('heliumJoshMode', String(!!isEnabled));
-      } catch (e) {}
-      applyClockDateVisibility();
+      clock.classList.add('josh-blur');
+      dateElement.classList.add('josh-blur');
+      setTimeout(() => {
+        try {
+          localStorage.setItem('heliumJoshMode', String(!!isEnabled));
+        } catch (e) {}
+        applyClockDateVisibility();
+        updateDateTime();
+        clock.classList.remove('josh-blur');
+        dateElement.classList.remove('josh-blur');
+      }, 220);
     }
 
     function applyClockDateVisibility() {
