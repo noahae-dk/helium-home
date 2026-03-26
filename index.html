@@ -1785,6 +1785,11 @@
     const danishMonths = ['Januar', 'Februar', 'Marts', 'April', 'Maj', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'December'];
     const englishDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const englishMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    function ordinalSuffix(d) {
+      if (d >= 11 && d <= 13) return d + 'th';
+      const s = ['th','st','nd','rd'];
+      return d + (s[d % 10] || 'th');
+    }
 
     function updateDateTime() {
       const now = new Date();
@@ -1798,7 +1803,7 @@
 
       clock.textContent = time;
       if (josh) {
-        dateElement.textContent = `${englishDays[now.getDay()]}, ${now.getDate()}, ${englishMonths[now.getMonth()]}`;
+        dateElement.textContent = `${englishDays[now.getDay()]}, ${englishMonths[now.getMonth()]} ${ordinalSuffix(now.getDate())}`;
       } else {
         dateElement.textContent = `${danishDays[now.getDay()]}, ${now.getDate()}, ${danishMonths[now.getMonth()]}`;
       }
