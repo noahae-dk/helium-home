@@ -4788,6 +4788,30 @@
       triggerCrowbarStrike();
     });
 
+    // Fade out crowbar when mouse leaves the page (e.g. tabs / URL bar)
+    document.addEventListener('mouseleave', () => {
+      if (!crowbarState.enabled) return;
+      crowbarCursor.classList.remove('active');
+    });
+
+    document.addEventListener('mouseenter', () => {
+      if (!crowbarState.enabled) return;
+      crowbarCursor.classList.add('active');
+    });
+
+    // Fade out crowbar on right-click; restore on next mousemove
+    document.addEventListener('contextmenu', () => {
+      if (!crowbarState.enabled) return;
+      crowbarCursor.classList.remove('active');
+    });
+
+    window.addEventListener('mousemove', () => {
+      if (!crowbarState.enabled) return;
+      if (!crowbarCursor.classList.contains('active')) {
+        crowbarCursor.classList.add('active');
+      }
+    }, { passive: true });
+
     window.addEventListener('resize', () => {
       syncCrowbarBounds();
       if (!crowbarState.enabled) {
