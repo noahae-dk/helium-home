@@ -1767,6 +1767,10 @@
         <span class="settings-item-label">Weather</span>
         <span class="settings-toggle"></span>
       </li>
+      <li class="settings-item" id="joshModeToggleItem" role="option">
+        <span class="settings-item-label">Josh Mode</span>
+        <span class="settings-toggle"></span>
+      </li>
     </ul>
     <ul class="settings-submenu" id="wallpaperSubmenu" role="listbox" aria-label="Wallpaper selection"></ul>
   </div>
@@ -1779,18 +1783,25 @@
 
     const danishDays = ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'];
     const danishMonths = ['Januar', 'Februar', 'Marts', 'April', 'Maj', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'December'];
+    const englishDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const englishMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
     function updateDateTime() {
       const now = new Date();
-      const time = now.toLocaleTimeString('en-GB', {
-        hour12: false,
-        hour: '2-digit',
+      const josh = isJoshMode();
+      const time = now.toLocaleTimeString(josh ? 'en-US' : 'en-GB', {
+        hour12: josh,
+        hour: josh ? 'numeric' : '2-digit',
         minute: '2-digit',
         second: '2-digit'
       });
 
       clock.textContent = time;
-      dateElement.textContent = `${danishDays[now.getDay()]}, ${now.getDate()}, ${danishMonths[now.getMonth()]}`;
+      if (josh) {
+        dateElement.textContent = `${englishDays[now.getDay()]}, ${now.getDate()}, ${englishMonths[now.getMonth()]}`;
+      } else {
+        dateElement.textContent = `${danishDays[now.getDay()]}, ${now.getDate()}, ${danishMonths[now.getMonth()]}`;
+      }
     }
 
     updateDateTime();
@@ -1907,6 +1918,7 @@
     const clockToggleItem = document.getElementById('clockToggleItem');
     const dateToggleItem = document.getElementById('dateToggleItem');
     const weatherToggleItem = document.getElementById('weatherToggleItem');
+    const joshModeToggleItem = document.getElementById('joshModeToggleItem');
     const aiPicker = document.getElementById('aiPicker');
     const aiTrigger = document.getElementById('aiTrigger');
     const aiTriggerIcon = document.getElementById('aiTriggerIcon');
@@ -1992,6 +2004,21 @@
       });
     }
 
+    function isJoshMode() {
+      try {
+        return localStorage.getItem('heliumJoshMode') === 'true';
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function setJoshMode(isEnabled) {
+      try {
+        localStorage.setItem('heliumJoshMode', String(!!isEnabled));
+      } catch (e) {}
+      applyClockDateVisibility();
+    }
+
     function applyClockDateVisibility() {
       const showClock = (() => {
         try {
@@ -2020,12 +2047,15 @@
         }
       })();
 
+      const josh = isJoshMode();
+
       clock.classList.toggle('is-hidden', !showClock);
       dateElement.classList.toggle('is-hidden', !showDate);
-      weatherLine.classList.toggle('is-hidden', !showWeather);
+      weatherLine.classList.toggle('is-hidden', !showWeather || josh);
       clockToggleItem.classList.toggle('is-on', showClock);
       dateToggleItem.classList.toggle('is-on', showDate);
       weatherToggleItem.classList.toggle('is-on', showWeather);
+      joshModeToggleItem.classList.toggle('is-on', josh);
 
       updateDateTime();
     }
@@ -4126,6 +4156,12 @@
       event.preventDefault();
       playUIClickSound();
       setWeatherVisibility(!weatherToggleItem.classList.contains('is-on'));
+    });
+
+    joshModeToggleItem.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+      playUIClickSound();
+      setJoshMode(!joshModeToggleItem.classList.contains('is-on'));
     });
 
 
