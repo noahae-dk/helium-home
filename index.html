@@ -1436,7 +1436,6 @@
       color: rgba(255, 255, 255, 0.34);
       text-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
       user-select: none;
-      cursor: pointer;
       opacity: 0.82;
       transition: opacity 0.22s cubic-bezier(.2,.8,.2,1), transform 0.22s cubic-bezier(.2,.8,.2,1), color 0.22s ease;
     }
@@ -1445,11 +1444,6 @@
       color: rgba(255, 255, 255, 0.6);
       transform: translateY(-2px);
     }
-    .hl-ref.game-active {
-      opacity: 0;
-      pointer-events: none;
-    }
-
     .hl-ref .lambda {
       color: rgba(var(--accent-rgb), 0.65);
       margin-right: 6px;
@@ -1465,116 +1459,10 @@
     .search-wrap {
       transition: opacity 0.34s cubic-bezier(.2,.8,.2,1), transform 0.34s cubic-bezier(.2,.8,.2,1);
     }
-    .search-wrap.game-hidden {
-      opacity: 0;
-      transform: translate(-50%, -50%) translateY(20px) scale(0.97);
-      pointer-events: none;
-    }
     .clock, .date, .weather-line {
       transition: opacity 0.26s ease, transform 0.26s cubic-bezier(.2,.8,.2,1);
     }
-    .clock.game-hidden, .date.game-hidden, .weather-line.game-hidden {
-      opacity: 0 !important;
-      transform: translateY(-12px);
-      pointer-events: none;
-    }
 
-    /* ── Game: container ─────────────────────────────────────────────── */
-    .game-wrap {
-      position: absolute;
-      top: 42%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.9);
-      width: min(900px, calc(100vw - 32px));
-      opacity: 0;
-      pointer-events: none;
-      z-index: 31;
-      transition: opacity 0.38s cubic-bezier(.2,.8,.2,1), transform 0.38s cubic-bezier(.2,.8,.2,1);
-    }
-    .game-wrap.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    #gameCanvas {
-      display: block;
-      width: 100%;
-      height: auto;
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
-      cursor: pointer;
-    }
-
-    /* ── Game: HUD ───────────────────────────────────────────────────── */
-    .game-hud {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      padding: 0 4px 5px;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      color: rgba(255, 255, 255, 0.45);
-      gap: 10px;
-    }
-    .game-hud-label {
-      color: rgba(var(--accent-rgb), 0.55);
-      margin-right: 5px;
-    }
-    #gameHiScore { opacity: 0.7; }
-
-    /* ── Game: game-over overlay ─────────────────────────────────────── */
-    .game-over-screen {
-      position: absolute;
-      left: 0; right: 0;
-      bottom: 42px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-    .game-over-screen.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .game-over-title {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 1.2rem;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      color: rgba(var(--accent-rgb), 0.92);
-      text-shadow: 0 0 16px rgba(var(--accent-rgb), 0.45), 0 0 32px rgba(var(--accent-rgb), 0.2);
-    }
-    .game-over-score {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 0.8rem;
-      letter-spacing: 0.12em;
-      color: rgba(255, 255, 255, 0.55);
-    }
-    .game-restart-btn {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      background: rgba(var(--accent-rgb), 0.1);
-      border: 1px solid rgba(var(--accent-rgb), 0.38);
-      color: rgba(var(--accent-rgb), 0.88);
-      padding: 6px 22px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
-      margin-top: 2px;
-    }
-    .game-restart-btn:hover {
-      background: rgba(var(--accent-rgb), 0.2);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(var(--accent-rgb), 0.2);
-    }
-    .game-restart-btn:active { transform: translateY(0) scale(0.97); }
 
   </style>
 </head>
@@ -1628,19 +1516,6 @@
       <ul class="suggestions" id="suggestions"></ul>
     </div>
 
-    <div class="game-wrap" id="gameWrap">
-      <div class="game-hud">
-        <span class="game-hud-label">HI</span><span id="gameHiScore">00000</span>
-        &nbsp;&nbsp;&nbsp;
-        <span id="gameScore">00000</span>
-      </div>
-      <canvas id="gameCanvas" width="900" height="220"></canvas>
-      <div class="game-over-screen" id="gameOverScreen">
-        <div class="game-over-title">GAME OVER</div>
-        <div class="game-over-score" id="gameFinalScore"></div>
-        <button class="game-restart-btn" id="gameRestartBtn">[ RESTART ]</button>
-      </div>
-    </div>
   </div>
 
 
@@ -1653,7 +1528,7 @@
     </button>
   </div>
 
-  <div class="hl-ref" id="hlRef"><span class="lambda">λ</span>stay freeman</div>
+  <div class="hl-ref"><span class="lambda">λ</span>stay freeman</div>
 
   <div class="settings-switcher" id="settingsSwitcher">
     <button class="settings-trigger" id="settingsTrigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Open settings">
@@ -1678,10 +1553,6 @@
       </li>
       <li class="settings-item is-on" id="weatherToggleItem" role="option">
         <span class="settings-item-label">Weather</span>
-        <span class="settings-toggle"></span>
-      </li>
-      <li class="settings-item is-on" id="soundToggleItem" role="option">
-        <span class="settings-item-label">Sound</span>
         <span class="settings-toggle"></span>
       </li>
     </ul>
@@ -1824,7 +1695,6 @@
     const clockToggleItem = document.getElementById('clockToggleItem');
     const dateToggleItem = document.getElementById('dateToggleItem');
     const weatherToggleItem = document.getElementById('weatherToggleItem');
-    const soundToggleItem = document.getElementById('soundToggleItem');
     const aiPicker = document.getElementById('aiPicker');
     const aiTrigger = document.getElementById('aiTrigger');
     const aiTriggerIcon = document.getElementById('aiTriggerIcon');
@@ -1940,13 +1810,10 @@
 
       clock.classList.toggle('is-hidden', !showClock);
       dateElement.classList.toggle('is-hidden', !showDate);
-      const showSound = isSoundEnabled();
-
       weatherLine.classList.toggle('is-hidden', !showWeather);
       clockToggleItem.classList.toggle('is-on', showClock);
       dateToggleItem.classList.toggle('is-on', showDate);
       weatherToggleItem.classList.toggle('is-on', showWeather);
-      soundToggleItem.classList.toggle('is-on', showSound);
 
       updateDateTime();
     }
@@ -1975,78 +1842,7 @@
       applyClockDateVisibility();
     }
 
-    function isSoundEnabled() {
-      try {
-        const saved = localStorage.getItem('heliumSoundEnabled');
-        return saved === null ? true : saved === 'true';
-      } catch (error) {
-        return true;
-      }
-    }
 
-    function setSoundEnabled(isEnabled) {
-      try {
-        localStorage.setItem('heliumSoundEnabled', String(!!isEnabled));
-      } catch (error) {
-      }
-      applyClockDateVisibility();
-    }
-
-    function getUIAudioContext() {
-      const AudioCtor = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtor) return null;
-      if (!uiAudioContext) uiAudioContext = new AudioCtor();
-      return uiAudioContext;
-    }
-
-    async function unlockUIAudio() {
-      const ctx = getUIAudioContext();
-      if (!ctx) return null;
-      if (ctx.state === 'suspended') {
-        try { await ctx.resume(); } catch (error) {}
-      }
-      return ctx;
-    }
-
-    function playTone(ctx, start, frequency, duration, type = 'sine', volume = 0.02) {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(frequency, start);
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(volume, start + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(start);
-      osc.stop(start + duration + 0.03);
-    }
-
-    function playUISound(kind = 'tap') {
-      if (!isSoundEnabled()) return;
-      const ctx = getUIAudioContext();
-      if (!ctx || ctx.state !== 'running') return;
-      const now = ctx.currentTime + 0.005;
-
-      if (kind === 'mode') {
-        playTone(ctx, now, 620, 0.08, 'triangle', 0.018);
-        playTone(ctx, now + 0.05, 880, 0.11, 'triangle', 0.016);
-        return;
-      }
-
-      if (kind === 'copy') {
-        playTone(ctx, now, 980, 0.05, 'sine', 0.016);
-        playTone(ctx, now + 0.035, 1310, 0.07, 'triangle', 0.012);
-        return;
-      }
-
-      if (kind === 'soft') {
-        playTone(ctx, now, 520, 0.05, 'sine', 0.012);
-        return;
-      }
-
-      playTone(ctx, now, 420, 0.045, 'triangle', 0.013);
-    }
 
     const aiProviders = {
       chatgpt: {
@@ -2140,7 +1936,6 @@
     let toggleLockedUntil = 0;
     let lastAIPromptIndex = -1;
     let currentQuickCopyText = '';
-    let uiAudioContext = null;
     const fxCache = new Map();
     const fxBaseCache = new Map();
     const helperCache = new Map();
@@ -3884,7 +3679,6 @@
     document.addEventListener('keydown', (event) => {
       if (event.ctrlKey && event.code === 'Space') {
         event.preventDefault();
-        if (window._hlGameActive && window._hlGameActive()) return;
         const now = Date.now();
         if (event.repeat || now < toggleLockedUntil) return;
         toggleLockedUntil = now + 220;
@@ -3897,8 +3691,7 @@
       if (!currentQuickCopyText) return;
       const copied = await copyTextToClipboard(currentQuickCopyText);
       if (copied) {
-        playUISound('copy');
-        quickResultCopy.classList.add('is-copied');
+          quickResultCopy.classList.add('is-copied');
         showCopyToast('Quick result copied');
         clearTimeout(quickCopyPulseTimer);
         quickCopyPulseTimer = setTimeout(() => {
@@ -4035,10 +3828,8 @@
       form.classList.remove('is-pressed');
     });
 
-    modeToggleBtn.addEventListener('click', async (event) => {
+    modeToggleBtn.addEventListener('click', (event) => {
       event.preventDefault();
-      await unlockUIAudio();
-      playUISound('mode');
       toggleMode();
     });
 
@@ -4050,10 +3841,8 @@
     }
     applyClockDateVisibility();
 
-    settingsTrigger.addEventListener('click', async (event) => {
+    settingsTrigger.addEventListener('click', (event) => {
       event.stopPropagation();
-      await unlockUIAudio();
-      playUISound('soft');
       animateSettingsTriggerButton();
       if (settingsMenu.classList.contains('visible')) {
         hideSettingsMenu();
@@ -4062,10 +3851,8 @@
       }
     });
 
-    wallpaperSettingsItem.addEventListener('mousedown', async (event) => {
+    wallpaperSettingsItem.addEventListener('mousedown', (event) => {
       event.preventDefault();
-      await unlockUIAudio();
-      playUISound('tap');
       if (wallpaperSubmenu.classList.contains('visible')) {
         hideWallpaperSubmenu();
       } else {
@@ -4073,56 +3860,31 @@
       }
     });
 
-    wallpaperSubmenu.addEventListener('mousedown', async (event) => {
+    wallpaperSubmenu.addEventListener('mousedown', (event) => {
       event.preventDefault();
       const option = event.target.closest('.wallpaper-subitem');
       if (!option) return;
-      await unlockUIAudio();
-      playUISound('tap');
       setWallpaper(option.dataset.wallpaper);
       hideSettingsMenu();
     });
 
-    clockToggleItem.addEventListener('mousedown', async (event) => {
+    clockToggleItem.addEventListener('mousedown', (event) => {
       event.preventDefault();
-      await unlockUIAudio();
-      playUISound('tap');
       setClockVisibility(!clockToggleItem.classList.contains('is-on'));
     });
 
-    dateToggleItem.addEventListener('mousedown', async (event) => {
+    dateToggleItem.addEventListener('mousedown', (event) => {
       event.preventDefault();
-      await unlockUIAudio();
-      playUISound('tap');
       setDateVisibility(!dateToggleItem.classList.contains('is-on'));
     });
 
-    weatherToggleItem.addEventListener('mousedown', async (event) => {
+    weatherToggleItem.addEventListener('mousedown', (event) => {
       event.preventDefault();
-      await unlockUIAudio();
-      playUISound('tap');
       setWeatherVisibility(!weatherToggleItem.classList.contains('is-on'));
     });
 
-    soundToggleItem.addEventListener('mousedown', async (event) => {
-      event.preventDefault();
-      const nextEnabled = !soundToggleItem.classList.contains('is-on');
-      if (nextEnabled) {
-        await unlockUIAudio();
-      }
-      setSoundEnabled(nextEnabled);
-      if (nextEnabled) {
-        playUISound('soft');
-      }
-    });
 
-    document.addEventListener('pointerdown', () => {
-      unlockUIAudio();
-    }, { passive: true, once: true });
 
-    document.addEventListener('keydown', () => {
-      unlockUIAudio();
-    }, { passive: true, once: true });
 
     buildAmbientParticles();
     updateWallpaperSubmenuPosition();
@@ -4180,719 +3942,6 @@
         performSearch(input.value);
       }
     });
-
-    // ═══════════════════════════════════════════════════════════════════
-    //  HALF-LIFE RUNNER  —  Gordon Freeman 8-bit endless runner
-    // ═══════════════════════════════════════════════════════════════════
-    (function () {
-      'use strict';
-
-      // ── DOM ──────────────────────────────────────────────────────────
-      const hlRef      = document.getElementById('hlRef');
-      const gameWrap   = document.getElementById('gameWrap');
-      const gc         = document.getElementById('gameCanvas');
-      const ctx        = gc.getContext('2d', { alpha: true });
-      const scoreEl    = document.getElementById('gameScore');
-      const hiEl       = document.getElementById('gameHiScore');
-      const overScreen = document.getElementById('gameOverScreen');
-      const finalEl    = document.getElementById('gameFinalScore');
-      const restartBtn = document.getElementById('gameRestartBtn');
-      const dateEl     = document.getElementById('date');
-      const weatherEl  = document.getElementById('weatherLine');
-
-      // ── CONSTANTS ────────────────────────────────────────────────────
-      const GW      = 900, GH = 220;
-      const SC      = 3;
-      const GROUND  = 178;
-      const STAND_H = 22 * SC;   // 66 canvas px
-      const CROUCH_H= 12 * SC;   // 36 canvas px
-      const PLAYER_W= 12 * SC;   // 36 canvas px
-      const PLAYER_X= 80;
-      const GRAVITY = 0.5;
-      const JUMP_VEL= -11;
-      const BASE_SPD= 3.5;
-      const SPD_INC = 0.0004;
-
-      // ── STATE ────────────────────────────────────────────────────────
-      let gameActive  = false;
-      let gameRunning = false;
-      let raf         = null;
-      let score       = 0;
-      let hiScore     = parseInt(localStorage.getItem('hlRunnerHi') || '0', 10);
-      let speed, frameCount;
-      let obstacles, groundX;
-      let bgCitadels, bgNextCitadel;
-      let player, crouchHeld;
-      let spawnReady, spawnWait;
-
-      // ── SPRITE PALETTE ───────────────────────────────────────────────
-      const PAL = {
-        '.': null,
-        // Gordon
-        // Gordon HEV suit (orange/amber)
-        'B': '#120804',  // outline
-        'n': '#c87040',  // skin
-        'N': '#e49060',  // skin highlight
-        'b': '#5c2c10',  // hair dark
-        'j': '#7c4018',  // hair mid
-        'O': '#c86010',  // HEV orange dark
-        'o': '#e07820',  // HEV orange
-        'Q': '#f09030',  // HEV orange bright
-        'P': '#1850a0',  // HEV blue panel
-        'p': '#0c3070',  // HEV blue dark
-        'A': '#d0c8a0',  // shoulder pad light
-        'a': '#a09888',  // shoulder pad dark
-        'D': '#9a5008',  // belt/trim
-        'd': '#6a3408',  // very dark trim
-        'K': '#1c1408',  // boot/pant dark
-        'k': '#2c1c10',  // boot/pant mid
-        // Headcrab (tan/brown)
-        'c': '#8a5820',  // body dark
-        'C': '#b07838',  // body mid
-        'u': '#c89848',  // highlight
-        'v': '#5a3010',  // shadow
-        // HECU Marine (military dark green)
-        'T': '#2a3018',  // military dark
-        't': '#3a4828',  // military mid
-        'G': '#566040',  // military light
-        'H': '#202018',  // helmet dark
-        'h': '#302820',  // helmet mid
-        'E': '#1c2c40',  // boot/strap dark
-        'e': '#2c3c50',  // boot/strap mid
-        // Manhack (dark steel + red eye)
-        'M': '#405868',  // body dark
-        'm': '#6090a8',  // body light
-        'R': '#ff3010',  // red eye
-        // Ammo Crate (military green box)
-        'X': '#3a4a2a',  // dark green
-        'x': '#4a5a38',  // mid green
-        'Z': '#6a7a50',  // light green
-        'z': '#303820',  // shadow green
-      };
-
-      // ── SPRITE DEFINITIONS ───────────────────────────────────────────
-      const SPR = {};
-
-      // Gordon — 12×22, run frame 0 (orange HEV suit)
-      SPR.run0 = [
-        '....BBBB....',
-        '...BbjjbB...',
-        '...BbjjbB...',
-        '...BNnnNB...',
-        '...BNnnBO...',
-        '..AaOoQoaA..',
-        '..oOoPPPOo..',
-        '..oOoPPPOo..',
-        '..oOOoOOoo..',
-        '..OOoQoOO...',
-        '...DDdDDD...',
-        '...KKkKKK...',
-        '..KKKkKKKK..',
-        '.KKKk.KKKk..',
-        '.KKKk.KKKk..',
-        '.KKk...KKk..',
-        '..kK...KkK..',
-        '..kK...KKK..',
-        '..KK...KKK..',
-        '..KK...KKK..',
-        '..BB...BBB..',
-        '..Bb...BBb..',
-      ];
-
-      // Gordon — 12×22, run frame 1
-      SPR.run1 = [
-        '....BBBB....',
-        '...BbjjbB...',
-        '...BbjjbB...',
-        '...BNnnNB...',
-        '...BNnnBO...',
-        '..AaOoQoaA..',
-        '..oOoPPPOo..',
-        '..oOoPPPOo..',
-        '..oOOoOOoo..',
-        '..OOoQoOO...',
-        '...DDdDDD...',
-        '...KKkKKK...',
-        '..KKKkKKKK..',
-        '..KKKkKKKK..',
-        '..KKKkKKKK..',
-        '..KKk.KKk...',
-        '.KKk...kK...',
-        '.KKK...kK...',
-        '.KKK...KK...',
-        '.KKK...KK...',
-        '.BBB...BB...',
-        '.BBb...Bb...',
-      ];
-
-      // Gordon — 12×22, jumping
-      SPR.jump = [
-        '....BBBB....',
-        '...BbjjbB...',
-        '...BbjjbB...',
-        '...BNnnNB...',
-        '...BNnnBO...',
-        '..AaOoQoaA..',
-        '..oOoPPPOo..',
-        '..oOoPPPOo..',
-        '..oOOoOOoo..',
-        '..OOoQoOO...',
-        '...DDdDDD...',
-        '...KKkKKK...',
-        '..KKKkKKK...',
-        '..KKKkKKK...',
-        '..KKKkKKK...',
-        '...KKkKK....',
-        '...KKkKK....',
-        '....KkK.....',
-        '....KKK.....',
-        '....KKK.....',
-        '....BBB.....',
-        '....BBb.....',
-      ];
-
-      // Gordon — 12×12, crouching
-      SPR.crouch = [
-        '....BBBB....',
-        '...BbjjbB...',
-        '...BNnnNB...',
-        '...BNnnBO...',
-        '..AaOoQoaA..',
-        '..oOoPPPOo..',
-        '..oOOoOOoo..',
-        '...DDdDDD...',
-        '.KKKkKKKK...',
-        'KKKk.KKKkK..',
-        'KKk...KKk...',
-        '.BB...BBB...',
-      ];
-
-      // Gordon — 12×8, dead/prone
-      SPR.dead = [
-        '............',
-        '.BBBb.......',
-        'BbjjbBOOO...',
-        'BNnnBOoQoO..',
-        'BNnnBOoOoK..',
-        '.BBBDdKKKKk.',
-        '....KKKKkK..',
-        '....KKKKKK..',
-      ];
-
-      // Headcrab — 12×8, frame 0
-      SPR.hcrab0 = [
-        '....cccc....',
-        '..ccCCCCcc..',
-        '.cCuuuuuuCc.',
-        'cCuu..uuuuCc',
-        'c.v..vuuuvcc',
-        '..v..vccv...',
-        '.vv.vcccv.vv',
-        '............',
-      ];
-
-      // Headcrab — 12×8, frame 1
-      SPR.hcrab1 = [
-        '....cccc....',
-        '..ccCCCCcc..',
-        '.cCuuuuuuCc.',
-        'cCuu..uuuuCc',
-        'c..v.vuuuvc.',
-        '..vv.vcccv..',
-        '..v..cccvv..',
-        '............',
-      ];
-
-      // HECU Marine — 12×20, frame 0
-      SPR.marine0 = [
-        '....HHHH....',
-        '...HHHHHH...',
-        '...HhHhHH...',
-        '...HHhhHH...',
-        '...BBHHHB...',
-        '..TTtTtTTH..',
-        '.TTTtttTTT..',
-        'ETTTtGtTTTe.',
-        'ETTTtGtTTTe.',
-        '..TTTtTTT...',
-        '..TTtttTT...',
-        '..EEeEEE....',
-        '..EEeEEE....',
-        '.EEEeEEEe...',
-        '.EEEeEEEe...',
-        '.EEe...Ee...',
-        '..Ee...eE...',
-        '..Ee...eE...',
-        '..EE...EE...',
-        '..EE...EE...',
-      ];
-
-      // HECU Marine — 12×20, frame 1
-      SPR.marine1 = [
-        '....HHHH....',
-        '...HHHHHH...',
-        '...HhHhHH...',
-        '...HHhhHH...',
-        '...BBHHHB...',
-        '..TTtTtTTH..',
-        '.TTTtttTTT..',
-        'ETTTtGtTTTe.',
-        'ETTTtGtTTTe.',
-        '..TTTtTTT...',
-        '..TTtttTT...',
-        '..EEeEEE....',
-        '..EEeEEE....',
-        '..EEEeEEE...',
-        '..EEEeEEE...',
-        '.EEEe.EEe...',
-        '.EEe...eE...',
-        '.EEE...eE...',
-        '.EEE...EE...',
-        '.EEE...EE...',
-      ];
-
-      // Ammo Crate — 12×9
-      SPR.crate = [
-        '..zXXXXXXz..',
-        '.zXZZZZZXXz.',
-        '.XZZXzXZZX..',
-        '.XZzXZXzZX..',
-        '.XZZzZZzZX..',
-        '.XZzXZXzZX..',
-        '.XZZXzXZZX..',
-        '.zXZZZZZXXz.',
-        '..zXXXXXXz..',
-      ];
-
-      // Manhack — 12×8, frame 0
-      SPR.mhack0 = [
-        '...mmmmmm...',
-        '..mMMMMMMm..',
-        '.mMMRMMRMMm.',
-        'mMMMMMMMMMMm',
-        'mMMMMMMMMMMm',
-        '.mMMMMMMMm..',
-        '..mmMMMmm...',
-        '............',
-      ];
-
-      // Manhack — 12×8, frame 1
-      SPR.mhack1 = [
-        '....mm.mm...',
-        '..mmMMMMMmm.',
-        '.mMM.RRR.Mm.',
-        'mMMM.....MMm',
-        '.mMMMMMMMm..',
-        '..mmMMMmm...',
-        '....mm.mm...',
-        '............',
-      ];
-
-      // ── SPRITE DRAW HELPER ───────────────────────────────────────────
-      function drawSpr(spr, dx, dy) {
-        for (let r = 0; r < spr.length; r++) {
-          const row = spr[r];
-          for (let c = 0; c < row.length; c++) {
-            const col = PAL[row[c]];
-            if (!col) continue;
-            ctx.fillStyle = col;
-            ctx.fillRect(dx + c * SC, dy + r * SC, SC, SC);
-          }
-        }
-      }
-
-      // ── CITADEL BACKGROUND ───────────────────────────────────────────
-      function updateBg() {
-        bgNextCitadel -= speed * 0.08;
-        if (bgNextCitadel <= 0) {
-          bgCitadels.push({ x: GW + 10 });
-          bgNextCitadel = 700 + Math.random() * 500;
-        }
-        bgCitadels = bgCitadels.filter(b => {
-          b.x -= speed * 0.07;
-          return b.x > -120;
-        });
-      }
-
-      function drawCitadel(cx) {
-        ctx.save();
-        ctx.globalAlpha = 0.12;
-        const dark = '#304060', mid = '#405070';
-        // Needle tip
-        ctx.fillStyle = mid;
-        ctx.fillRect(cx + 28, 18, 4, 12);
-        ctx.fillRect(cx + 29, 12, 2, 8);
-        // Upper spire
-        ctx.fillStyle = dark;
-        ctx.fillRect(cx + 24, 28, 12, 26);
-        ctx.fillStyle = mid;
-        ctx.fillRect(cx + 25, 28, 3, 26);
-        // Mid section
-        ctx.fillStyle = dark;
-        ctx.fillRect(cx + 18, 52, 24, 8);
-        ctx.fillRect(cx + 20, 58, 20, 42);
-        ctx.fillStyle = mid;
-        ctx.fillRect(cx + 21, 58, 3, 42);
-        // Base
-        ctx.fillStyle = dark;
-        ctx.fillRect(cx + 10, 98, 40, 10);
-        ctx.fillRect(cx + 4,  106, 52, 60);
-        ctx.fillStyle = mid;
-        ctx.fillRect(cx + 5, 106, 4, 60);
-        // Window lights (teal)
-        ctx.fillStyle = 'rgba(104,255,191,0.5)';
-        for (let wy = 62; wy < 98; wy += 10) {
-          ctx.fillRect(cx + 34, wy, 3, 4);
-          ctx.fillRect(cx + 37, wy + 3, 2, 3);
-        }
-        for (let wy = 112; wy < 160; wy += 12) {
-          ctx.fillRect(cx + 44, wy, 4, 5);
-          ctx.fillRect(cx + 16, wy + 4, 3, 4);
-        }
-        // Top beacon
-        ctx.fillStyle = 'rgba(104,255,191,0.85)';
-        ctx.fillRect(cx + 29, 10, 2, 3);
-        ctx.restore();
-      }
-
-      function drawBg() {
-        for (const b of bgCitadels) drawCitadel(b.x);
-      }
-
-      // ── GROUND ───────────────────────────────────────────────────────
-      function drawGround() {
-        ctx.fillStyle = 'rgba(220,210,200,0.5)';
-        ctx.fillRect(0, GROUND, GW, 2);
-        ctx.fillStyle = 'rgba(220,210,200,0.2)';
-        ctx.fillRect(0, GROUND + 5, GW, 1);
-        // Scrolling dash marks
-        ctx.fillStyle = 'rgba(220,210,200,0.18)';
-        const tw = 22;
-        const off = Math.floor(Math.abs(groundX)) % tw;
-        for (let x = -(tw - off) % tw; x < GW; x += tw) {
-          ctx.fillRect(x, GROUND + 2, 11, 2);
-        }
-      }
-
-      // ── PLAYER ───────────────────────────────────────────────────────
-      function resetPlayer() {
-        player = {
-          y: GROUND - STAND_H,
-          vy: 0,
-          onGround: true,
-          crouching: false,
-          frame: 0,
-          frameTick: 0,
-          state: 'run',
-          deadTick: 0,
-          flashOn: false,
-        };
-      }
-
-      function playerH() { return player.crouching ? CROUCH_H : STAND_H; }
-
-      function hitbox() {
-        const pad = 5;
-        return {
-          x: PLAYER_X + pad,
-          y: player.y + pad,
-          w: PLAYER_W - pad * 2,
-          h: playerH() - pad * 2,
-        };
-      }
-
-      function updatePlayer() {
-        if (player.state === 'dead') return;
-        const wantCrouch = crouchHeld && player.onGround;
-        if (wantCrouch !== player.crouching) {
-          player.crouching = wantCrouch;
-          if (player.crouching) {
-            player.y = GROUND - CROUCH_H;
-            player.state = 'crouch';
-          } else {
-            player.y = GROUND - STAND_H;
-            player.state = player.onGround ? 'run' : 'jump';
-          }
-        }
-        if (!player.onGround) {
-          player.vy += GRAVITY;
-          player.y += player.vy;
-          if (player.y >= GROUND - playerH()) {
-            player.y = GROUND - playerH();
-            player.vy = 0;
-            player.onGround = true;
-            player.state = player.crouching ? 'crouch' : 'run';
-          }
-        }
-        if (player.state === 'run' || player.state === 'crouch') {
-          player.frameTick++;
-          if (player.frameTick >= 7) {
-            player.frameTick = 0;
-            player.frame = 1 - player.frame;
-          }
-        }
-      }
-
-      function drawPlayer() {
-        const x = PLAYER_X;
-        const y = player.y;
-        if (player.state === 'dead') {
-          if (player.deadTick < 8 && player.flashOn) {
-            ctx.fillStyle = 'rgba(255,50,10,0.28)';
-            ctx.fillRect(x - 4, y - 2, PLAYER_W + 8, STAND_H + 6);
-          }
-          player.deadTick++;
-          player.flashOn = !player.flashOn;
-          drawSpr(SPR.dead, x, y);
-          return;
-        }
-        if (player.state === 'crouch') {
-          drawSpr(SPR.crouch, x, y);
-        } else if (player.state === 'jump') {
-          drawSpr(SPR.jump, x, y);
-        } else {
-          drawSpr(player.frame === 0 ? SPR.run0 : SPR.run1, x, y);
-        }
-      }
-
-      // ── OBSTACLES ────────────────────────────────────────────────────
-      //  hcrab/crate/marine = ground (jump over)
-      //  mhack = aerial at airY=117 (crouch under — bottom=141, above crouching Gordon top=142)
-      const OBS_DEFS = {
-        hcrab:  { w: 12*SC, h: 8*SC,  airY: null, frames: ['hcrab0','hcrab1']   },
-        crate:  { w: 12*SC, h: 9*SC,  airY: null, frames: ['crate','crate']      },
-        marine: { w: 12*SC, h: 20*SC, airY: null, frames: ['marine0','marine1']  },
-        mhack:  { w: 12*SC, h: 8*SC,  airY: 117,  frames: ['mhack0','mhack1']   },
-      };
-
-      function spawnObstacle() {
-        const last = obstacles[obstacles.length - 1];
-        const lastAir = last && OBS_DEFS[last.type].airY !== null;
-        let pool = ['hcrab','hcrab','crate','marine','mhack'];
-        if (lastAir) pool = ['hcrab','hcrab','crate','marine'];
-        if (speed < 5)  pool = pool.filter(t => t !== 'marine');
-
-        const type = pool[Math.floor(Math.random() * pool.length)];
-        const def  = OBS_DEFS[type];
-        const isAir = def.airY !== null;
-        const y = isAir ? def.airY : GROUND - def.h;
-
-        // Occasionally spawn headcrab pairs
-        if (type === 'hcrab' && Math.random() < 0.35) {
-          obstacles.push({ type, x: GW + 10, y, w: def.w, h: def.h, frame: 0, tick: 0 });
-          obstacles.push({ type, x: GW + 10 + def.w + SC * 3, y, w: def.w, h: def.h, frame: 0, tick: 0 });
-        } else {
-          obstacles.push({ type, x: GW + 10, y, w: def.w, h: def.h, frame: 0, tick: 0 });
-        }
-      }
-
-      function updateObstacles() {
-        const last = obstacles[obstacles.length - 1];
-        // Minimum gap: enough room to complete a full jump
-        const minGapPx = Math.max(280, speed * 50 + 100);
-
-        if (!spawnReady) {
-          const gapOk = frameCount > 90 && (!last || (last.x + last.w) < GW - minGapPx);
-          if (gapOk) {
-            spawnReady = true;
-            spawnWait  = Math.floor(20 + Math.random() * 60);
-          }
-        }
-        if (spawnReady && --spawnWait <= 0) {
-          spawnObstacle();
-          spawnReady = false;
-        }
-
-        obstacles = obstacles.filter(o => {
-          o.x -= speed;
-          o.tick++;
-          if (o.tick % 9 === 0) o.frame = 1 - o.frame;
-          return o.x + o.w > -20;
-        });
-      }
-
-      function drawObstacles() {
-        for (const o of obstacles) {
-          const def = OBS_DEFS[o.type];
-          drawSpr(SPR[def.frames[o.frame]], o.x, o.y);
-        }
-      }
-
-      // ── COLLISION ────────────────────────────────────────────────────
-      function rectsOverlap(a, b) {
-        return a.x < b.x + b.w && a.x + a.w > b.x &&
-               a.y < b.y + b.h && a.y + a.h > b.y;
-      }
-
-      function checkCollisions() {
-        const ph = hitbox();
-        for (const o of obstacles) {
-          if (rectsOverlap(ph, { x: o.x + 4, y: o.y + 4, w: o.w - 8, h: o.h - 8 })) {
-            killPlayer(); return;
-          }
-        }
-      }
-
-      function killPlayer() {
-        if (player.state === 'dead') return;
-        player.state = 'dead';
-        gameRunning = false;
-        if (score > hiScore) {
-          hiScore = score;
-          localStorage.setItem('hlRunnerHi', hiScore);
-          hiEl.textContent = fmtScore(hiScore);
-        }
-        finalEl.textContent = 'SCORE  ' + fmtScore(score);
-        setTimeout(() => {
-          if (gameActive) overScreen.classList.add('is-visible');
-        }, 700);
-      }
-
-      // ── SCORE ────────────────────────────────────────────────────────
-      function fmtScore(n) { return String(Math.min(n, 99999)).padStart(5, '0'); }
-
-      function updateScore() {
-        score++;
-        if (score % 2 === 0) {
-          scoreEl.textContent = fmtScore(score);
-          if (score > hiScore) {
-            hiScore = score;
-            hiEl.textContent = fmtScore(hiScore);
-          }
-        }
-      }
-
-      // ── GAME LOOP ─────────────────────────────────────────────────────
-      function gameLoop() {
-        if (!gameActive) return;
-
-        ctx.clearRect(0, 0, GW, GH);
-
-        if (gameRunning) { updateBg(); groundX -= speed; }
-        drawBg();
-        drawGround();
-
-        if (gameRunning) {
-          updatePlayer();
-          updateObstacles();
-          checkCollisions();
-          updateScore();
-          speed += SPD_INC;
-          frameCount++;
-        }
-
-        drawObstacles();
-        drawPlayer();
-
-        raf = requestAnimationFrame(gameLoop);
-      }
-
-      // ── INPUT ─────────────────────────────────────────────────────────
-      function doJump() {
-        if (!player || player.state === 'dead') return;
-        if (player.onGround && !player.crouching) {
-          player.vy = JUMP_VEL;
-          player.onGround = false;
-          player.state = 'jump';
-        }
-      }
-
-      function doRestart() {
-        overScreen.classList.remove('is-visible');
-        startGame();
-      }
-
-      document.addEventListener('keydown', (e) => {
-        if (!gameActive) return;
-        if (e.code === 'Escape') {
-          e.preventDefault();
-          e.stopPropagation();
-          exitGame();
-          return;
-        }
-        if (e.code === 'Space' || e.code === 'ArrowUp') {
-          e.preventDefault();
-          if (player && player.state === 'dead' && !gameRunning) { doRestart(); return; }
-          doJump();
-          return;
-        }
-        if (e.code === 'ArrowDown') {
-          e.preventDefault();
-          crouchHeld = true;
-        }
-      }, true);
-
-      document.addEventListener('keyup', (e) => {
-        if (!gameActive) return;
-        if (e.code === 'ArrowDown') crouchHeld = false;
-      }, true);
-
-      gc.addEventListener('mousedown', (e) => {
-        if (!gameActive) return;
-        e.preventDefault();
-        if (player && player.state === 'dead' && !gameRunning) { doRestart(); return; }
-        doJump();
-      });
-
-      restartBtn.addEventListener('click', doRestart);
-
-      // ── GAME START ────────────────────────────────────────────────────
-      function startGame() {
-        score         = 0;
-        speed         = BASE_SPD;
-        frameCount    = 0;
-        obstacles     = [];
-        bgCitadels    = [];
-        bgNextCitadel = 400;
-        groundX       = 0;
-        crouchHeld    = false;
-        spawnReady    = false;
-        spawnWait     = 0;
-        resetPlayer();
-        scoreEl.textContent = '00000';
-        hiEl.textContent    = fmtScore(hiScore);
-        overScreen.classList.remove('is-visible');
-        gameRunning = true;
-        if (!raf) raf = requestAnimationFrame(gameLoop);
-      }
-
-      // ── TRANSITIONS ──────────────────────────────────────────────────
-      function enterGame() {
-        gameActive = true;
-        hlRef.classList.add('game-active');
-        searchWrap.classList.add('game-hidden');
-        clock.classList.add('game-hidden');
-        dateEl.classList.add('game-hidden');
-        weatherEl.classList.add('game-hidden');
-        setTimeout(() => {
-          gameWrap.classList.add('is-visible');
-          startGame();
-        }, 300);
-      }
-
-      function exitGame() {
-        gameRunning = false;
-        gameActive  = false;
-        if (raf) { cancelAnimationFrame(raf); raf = null; }
-        overScreen.classList.remove('is-visible');
-        gameWrap.classList.remove('is-visible');
-        hlRef.classList.remove('game-active');
-        setTimeout(() => {
-          searchWrap.classList.remove('game-hidden');
-          clock.classList.remove('game-hidden');
-          dateEl.classList.remove('game-hidden');
-          weatherEl.classList.remove('game-hidden');
-        }, 280);
-      }
-
-      hlRef.addEventListener('click', () => {
-        if (!gameActive) enterGame();
-      });
-
-      window._hlGameActive = () => gameActive;
-
-    }());
-    // ─── end Half-Life Runner ───────────────────────────────────────────
   </script>
 
 
