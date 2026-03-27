@@ -4759,7 +4759,7 @@
     const headcrabState = { hits: 0, alive: false, idlePlayed: false, revealTimer: 0, deathAnimation: null, horizontalOffset: null };
 
     function randomizeHeadcrabHorizontalOffset() {
-      headcrabState.horizontalOffset = Math.round((Math.random() - 0.5) * 52);
+      headcrabState.horizontalOffset = Math.random(); // 0–1, scaled to full width in positionHeadcrab
     }
 
     function positionHeadcrab() {
@@ -4769,10 +4769,6 @@
       const crabWidth = crabRect.width || 110;
       const crabHeight = crabRect.height || ((crabWidth / 474) * 207);
 
-      // Visually: the headcrab should sit ABOVE the search bar.
-      // Layering: it should still be UNDER the search bar element.
-      // So only the bottom ~18% of the crab should tuck behind the bar.
-      const rightInset = Math.round(Math.max(40, Math.min(72, crabWidth * 0.6)));
       const tuckedUnderBar = crabHeight * 0.18;
       const crabTop = Math.round(barRect.top - crabHeight + tuckedUnderBar);
 
@@ -4780,10 +4776,9 @@
         randomizeHeadcrabHorizontalOffset();
       }
 
-      const baseLeft = inputRect.right - crabWidth - rightInset;
       const minLeft = inputRect.left + 14;
       const maxLeft = inputRect.right - crabWidth - 14;
-      const crabLeft = Math.max(minLeft, Math.min(maxLeft, baseLeft + headcrabState.horizontalOffset));
+      const crabLeft = Math.round(minLeft + headcrabState.horizontalOffset * (maxLeft - minLeft));
 
       hlHeadcrab.style.left = Math.round(crabLeft) + 'px';
       hlHeadcrab.style.top  = crabTop + 'px';
