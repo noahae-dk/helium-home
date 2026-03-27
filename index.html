@@ -1537,6 +1537,73 @@
       color: rgba(255, 255, 255, 0.88);
     }
 
+    /* ── Metro cop speech bubble ─────────────────────────────────────── */
+    .metro-speech-bubble {
+      position: fixed;
+      left: 22px;
+      bottom: 46px;
+      z-index: 116;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(5px);
+    }
+    .metro-speech-bubble.is-visible {
+      animation: metroBubbleIn 0.52s cubic-bezier(.2,.8,.2,1) forwards;
+    }
+    .metro-speech-bubble.is-hiding {
+      animation: none !important;
+      opacity: 0 !important;
+      transform: translateY(3px) !important;
+      transition: opacity 0.28s ease, transform 0.28s ease;
+    }
+    .metro-speech-inner {
+      background: rgba(8, 10, 14, 0.92);
+      border: 1px solid rgba(var(--accent-rgb), 0.24);
+      border-radius: 7px;
+      padding: 5px 10px 5px 9px;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.09em;
+      color: rgba(255, 255, 255, 0.70);
+      white-space: nowrap;
+      box-shadow:
+        0 0 18px rgba(var(--accent-rgb), 0.06),
+        0 2px 14px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+      position: relative;
+    }
+    .metro-speech-inner::before {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 16px;
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid rgba(var(--accent-rgb), 0.24);
+    }
+    .metro-speech-inner::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 17px;
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid rgba(8, 10, 14, 0.92);
+    }
+    @keyframes metroBubbleIn {
+      0%   { opacity: 0;    transform: translateY(5px); }
+      18%  { opacity: 0.9;  transform: translateY(0); }
+      27%  { opacity: 0.38; transform: translateY(0); }
+      34%  { opacity: 0.88; transform: translateY(0); }
+      42%  { opacity: 0.52; transform: translateY(0); }
+      52%  { opacity: 1;    transform: translateY(0); }
+      100% { opacity: 1;    transform: translateY(0); }
+    }
+
     .hl-ref.is-exhausted {
       color: rgba(255, 255, 255, 0.52);
     }
@@ -1808,6 +1875,9 @@
   <button class="hl-ref" id="hlRef" type="button" aria-label="Activate crowbar mode">
     <span class="lambda">λ</span>stay freeman
   </button>
+  <div class="metro-speech-bubble" id="metroSpeechBubble" aria-hidden="true">
+    <div class="metro-speech-inner"><span id="metroSpeechText"></span></div>
+  </div>
   <div class="hl-can" id="hlCan" aria-hidden="true">
     <img class="hl-can-main" id="hlCanImg" alt="" draggable="false" />
     <img class="hl-can-trail" id="hlCanTrailImg" alt="" draggable="false" />
@@ -4318,6 +4388,8 @@
     const crowbarCursor = document.getElementById('crowbarCursor');
     const crowbarCursorImg = document.getElementById('crowbarCursorImg');
     const hlHeadcrab = document.getElementById('hlHeadcrab');
+    const metroSpeechBubble = document.getElementById('metroSpeechBubble');
+    const metroSpeechText   = document.getElementById('metroSpeechText');
     const headcrabParticlesCanvas = document.getElementById('headcrabParticles');
     const hpCtx = headcrabParticlesCanvas.getContext('2d', { alpha: true });
     function resizeParticleCanvas() {
@@ -4440,10 +4512,10 @@
     const headcrabDieAudioState    = { index: 0 };
 
     const metroDispatchLines = [
-      { src: './pickupthecan1.wav' },
-      { src: './pickupthecan2.wav' },
-      { src: './pickupthecan3.wav' },
-      { src: './allrightyoucango.wav' }
+      { src: './pickupthecan1.wav',   text: 'Pick up that can.' },
+      { src: './pickupthecan2.wav',   text: 'Pick. Up. The can..' },
+      { src: './pickupthecan3.wav',   text: 'I said, pick up the can!' },
+      { src: './allrightyoucango.wav', text: 'Alright, you can go.' },
     ].map((line) => {
       const audio = new Audio(line.src);
       audio.preload = 'auto';
@@ -4466,11 +4538,11 @@
 
     function buildPostMetroDispatchLines() {
       const extras = shuffleArray([
-        { src: './keepmoving.wav' },
-        { src: './moveit.wav' },
-        { src: './freeman.wav' },
-        { src: './firstwarningmove.wav', key: 'warning1' },
-        { src: './thisisyoursecondwarning.wav', key: 'warning2' }
+        { src: './keepmoving.wav',              text: 'Keep moving.' },
+        { src: './moveit.wav',                  text: 'Move it!' },
+        { src: './freeman.wav',                 text: 'Freeman!' },
+        { src: './firstwarningmove.wav',        text: 'First warning, move away!',      key: 'warning1' },
+        { src: './thisisyoursecondwarning.wav', text: 'This is your second warning.',   key: 'warning2' },
       ]);
 
       const warning1Index = extras.findIndex((line) => line.key === 'warning1');
@@ -4760,6 +4832,7 @@
       lambdaEl.style.filter = '';
       lambdaEl.style.textShadow = '';
       hlRef.classList.remove('is-armed', 'is-speaking', 'is-exhausted', 'is-dropping', 'is-mode-shifting');
+      hideMetroSpeechBubble();
     }
 
     const headcrabState = { hits: 0, alive: false, idlePlayed: false, revealTimer: 0, deathAnimation: null, horizontalOffset: null };
@@ -5049,6 +5122,23 @@
       crowbarState.raf = requestAnimationFrame(animateCrowbarCursor);
     }
 
+    let metroBubbleHideTimer = null;
+    function showMetroSpeechBubble(text) {
+      if (metroBubbleHideTimer) { clearTimeout(metroBubbleHideTimer); metroBubbleHideTimer = null; }
+      metroSpeechText.textContent = text;
+      metroSpeechBubble.classList.remove('is-hiding', 'is-visible');
+      void metroSpeechBubble.offsetWidth;
+      metroSpeechBubble.classList.add('is-visible');
+    }
+    function hideMetroSpeechBubble() {
+      metroSpeechBubble.classList.remove('is-visible');
+      metroSpeechBubble.classList.add('is-hiding');
+      metroBubbleHideTimer = setTimeout(() => {
+        metroSpeechBubble.classList.remove('is-hiding');
+        metroBubbleHideTimer = null;
+      }, 320);
+    }
+
     function handleMetroLineTrigger() {
       const now = performance.now();
       if (metroBusy || now < metroCooldownUntil) {
@@ -5059,6 +5149,7 @@
         metroBusy = true;
         activeMetroAudio = line.audio;
         hlRef.classList.add('is-speaking');
+        if (line.text) showMetroSpeechBubble(line.text);
 
         const finalize = () => {
           if (!activeMetroAudio) return;
@@ -5067,6 +5158,7 @@
           metroBusy = false;
           metroCooldownUntil = performance.now() + 1000;
           hlRef.classList.remove('is-speaking');
+          hideMetroSpeechBubble();
           activeMetroAudio = null;
           if (typeof onAfterEnd === 'function') {
             onAfterEnd();
@@ -5217,6 +5309,7 @@
       activeMetroAudio = null;
       metroBusy = false;
       hlRef.classList.remove('is-speaking');
+      hideMetroSpeechBubble();
       metroCooldownUntil = performance.now() + 300;
     });
 
