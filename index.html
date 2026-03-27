@@ -4400,14 +4400,18 @@
     }
 
     const crowbarHitAudioPool = createAudioPool('./cbar_hit2.wav', 0.10, 7);
-    const uiClickAudioPool = createAudioPool('./beep.wav', 0.10, 6);
+    const uiClickAudioPools = [
+      createAudioPool('./beep.wav',         0.10, 4),
+      createAudioPool('./ifm_denyundo.wav', 0.10, 4),
+      createAudioPool('./button3.wav',      0.10, 4),
+    ];
     const hlRefBeepAudioPool  = createAudioPool('./beep.wav',         0.10, 6);
     const hlRefIntroAudioPool = createAudioPool('./intro1.wav',      0.10, 2);
     const hlRefAmmoAudioPool       = createAudioPool('./ammo_pickup.wav',       0.10, 2);
     const bugreporterAudioPool     = createAudioPool('./bugreporter_failed.wav', 0.10, 2);
 
     const crowbarHitAudioState     = { index: 0 };
-    const uiClickAudioState        = { index: 0 };
+    const uiClickAudioStates = [{ index: 0 }, { index: 0 }, { index: 0 }];
     const hlRefBeepAudioState      = { index: 0 };
     const hlRefIntroAudioState     = { index: 0 };
     const hlRefAmmoAudioState      = { index: 0 };
@@ -4977,7 +4981,8 @@
 
     function playUIClickSound() {
       if (!crowbarState.enabled) return;
-      playFromPool(uiClickAudioPool, uiClickAudioState);
+      const i = Math.floor(Math.random() * uiClickAudioPools.length);
+      playFromPool(uiClickAudioPools[i], uiClickAudioStates[i]);
     }
 
     function playHlRefActivateSounds() {
