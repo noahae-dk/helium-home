@@ -1726,17 +1726,6 @@
 
     .hl-headcrab.is-dying {
       pointer-events: none;
-      animation: headcrabDie 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
-
-    @keyframes headcrabDie {
-      0%   { opacity: 1;    filter: blur(0px);   transform: translate(0,      0px)   rotate(0deg)   scale(1);    }
-      10%  { opacity: 1;    filter: blur(0px);   transform: translate(-6px, -20px)   rotate(-18deg) scale(1.07); }
-      24%  { opacity: 1;    filter: blur(1px);   transform: translate(4px,  -10px)   rotate(45deg)  scale(1.02); }
-      42%  { opacity: 0.95; filter: blur(3px);   transform: translate(10px,  28px)   rotate(135deg) scale(0.96); }
-      60%  { opacity: 0.75; filter: blur(7px);   transform: translate(14px,  76px)   rotate(210deg) scale(0.9);  }
-      78%  { opacity: 0.35; filter: blur(12px);  transform: translate(17px,  128px)  rotate(270deg) scale(0.84); }
-      100% { opacity: 0;    filter: blur(20px);  transform: translate(20px,  180px)  rotate(320deg) scale(0.76); }
     }
 
     @keyframes headcrabHitShake {
@@ -4414,13 +4403,15 @@
     const uiClickAudioPool = createAudioPool('./beep.wav', 0.10, 6);
     const hlRefBeepAudioPool  = createAudioPool('./beep.wav',         0.10, 6);
     const hlRefIntroAudioPool = createAudioPool('./intro1.wav',      0.10, 2);
-    const hlRefAmmoAudioPool  = createAudioPool('./ammo_pickup.wav', 0.10, 2);
+    const hlRefAmmoAudioPool       = createAudioPool('./ammo_pickup.wav',       0.10, 2);
+    const bugreporterAudioPool     = createAudioPool('./bugreporter_failed.wav', 0.10, 2);
 
-    const crowbarHitAudioState = { index: 0 };
-    const uiClickAudioState    = { index: 0 };
-    const hlRefBeepAudioState  = { index: 0 };
-    const hlRefIntroAudioState = { index: 0 };
-    const hlRefAmmoAudioState  = { index: 0 };
+    const crowbarHitAudioState     = { index: 0 };
+    const uiClickAudioState        = { index: 0 };
+    const hlRefBeepAudioState      = { index: 0 };
+    const hlRefIntroAudioState     = { index: 0 };
+    const hlRefAmmoAudioState      = { index: 0 };
+    const bugreporterAudioState    = { index: 0 };
 
     let crowbarIntroPlayed = false;
 
@@ -5005,6 +4996,9 @@
         playHlRefBeepSound();
       } else {
         playCrowbarHitSound();
+        if (Math.random() < 0.1) {
+          playFromPool(bugreporterAudioPool, bugreporterAudioState);
+        }
       }
     }
 
@@ -5018,17 +5012,17 @@
       crowbarState.prevMouseX = crowbarState.mouseX;
       crowbarState.prevMouseY = crowbarState.mouseY;
 
-      crowbarState.vx = (crowbarState.vx * 0.62) + (rawDX * 0.38);
-      crowbarState.vy = (crowbarState.vy * 0.62) + (rawDY * 0.38);
+      crowbarState.vx = (crowbarState.vx * 0.54) + (rawDX * 0.46);
+      crowbarState.vy = (crowbarState.vy * 0.54) + (rawDY * 0.46);
 
-      const motionAngle = clamp((crowbarState.vx * 1.06) + (crowbarState.vy * 0.12), -16, 16);
+      const motionAngle = clamp((crowbarState.vx * 1.4) + (crowbarState.vy * 0.22), -30, 30);
 
-      crowbarState.swingVelocity += (0 - crowbarState.swing) * 0.14;
-      crowbarState.swingVelocity *= 0.82;
+      crowbarState.swingVelocity += (0 - crowbarState.swing) * 0.18;
+      crowbarState.swingVelocity *= 0.76;
       crowbarState.swing += crowbarState.swingVelocity;
-      crowbarState.swing *= 0.93;
+      crowbarState.swing *= 0.90;
 
-      crowbarState.angle += ((motionAngle + crowbarState.swing) - crowbarState.angle) * 0.28;
+      crowbarState.angle += ((motionAngle + crowbarState.swing) - crowbarState.angle) * 0.32;
 
       const easedSpawn = 1 - Math.pow(1 - crowbarState.spawn, 3);
       const spawnScale = 0.80 + (0.20 * easedSpawn);
@@ -5042,8 +5036,8 @@
       const tx = target.x - (crowbarState.width * 0.5) + recoilX;
       const ty = target.y - (crowbarState.height * 0.5) + recoilY;
       const speed = Math.hypot(crowbarState.vx, crowbarState.vy);
-      const motionBlur = Math.min(1.1, speed * 0.05);
-      const motionBright = 1 + Math.min(0.08, speed * 0.004);
+      const motionBlur = Math.min(4.5, speed * 0.18);
+      const motionBright = 1 + Math.min(0.12, speed * 0.005);
 
       crowbarCursorImg.style.filter = `blur(${motionBlur.toFixed(2)}px) brightness(${motionBright.toFixed(3)}) drop-shadow(0 0 1px rgba(255,255,255,0.12)) drop-shadow(0 4px 10px rgba(0,0,0,0.30))`;
       crowbarCursor.style.transform = `translate3d(${tx}px, ${ty}px, 0) rotate(${renderAngle}deg) scale(${spawnScale * recoilScale})`;
