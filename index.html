@@ -4415,11 +4415,17 @@
 
     const crowbarHitAudioPool = createAudioPool('./cbar_hit2.wav', 0.10, 7);
     const uiClickAudioPool = createAudioPool('./ifm_denyundo.wav', 0.10, 6);
-    const hlRefBeepAudioPool = createAudioPool('./beep.wav', 0.10, 6);
+    const hlRefBeepAudioPool  = createAudioPool('./beep.wav',         0.10, 6);
+    const hlRefIntroAudioPool = createAudioPool('./intro1.wav',       0.10, 2);
+    const hlRefAmmoAudioPool  = createAudioPool('./ammo_pickup.wav',  0.10, 2);
+    const hlRefGmanAudioPool  = createAudioPool('./gman_mono01.wav',  0.10, 2);
 
     const crowbarHitAudioState = { index: 0 };
-    const uiClickAudioState = { index: 0 };
-    const hlRefBeepAudioState = { index: 0 };
+    const uiClickAudioState    = { index: 0 };
+    const hlRefBeepAudioState  = { index: 0 };
+    const hlRefIntroAudioState = { index: 0 };
+    const hlRefAmmoAudioState  = { index: 0 };
+    const hlRefGmanAudioState  = { index: 0 };
 
     const headcrabIdleAudioPool   = createAudioPool('./idle1.wav',       0.10, 2);
     const headcrabAttackAudioPool = createAudioPool('./attack3.wav',     0.10, 2);
@@ -4773,9 +4779,6 @@
       setTimeout(() => {
         hlHeadcrab.classList.add('is-visible');
       }, 300);
-      setTimeout(() => {
-        playFromPool(headcrabIdleAudioPool, headcrabIdleAudioState);
-      }, 1000);
     }
 
     function hideHeadcrab() {
@@ -4864,6 +4867,7 @@
     hlHeadcrab.addEventListener('mouseenter', () => {
       if (!headcrabState.alive || !crowbarState.enabled) return;
       hlHeadcrab.classList.add('is-hovered');
+      playFromPool(headcrabIdleAudioPool, headcrabIdleAudioState);
     });
 
     hlHeadcrab.addEventListener('mouseleave', () => {
@@ -4898,11 +4902,6 @@
         crowbarState.raf = requestAnimationFrame(animateCrowbarCursor);
       }
 
-      // Pre-unlock idle audio within the user gesture so setTimeout playback works
-      const idleUnlock = headcrabIdleAudioPool[headcrabIdleAudioState.index];
-      idleUnlock.volume = 0;
-      idleUnlock.play().then(() => { idleUnlock.pause(); idleUnlock.currentTime = 0; idleUnlock.volume = 0.10; }).catch(() => {});
-
       showHeadcrab();
     }
 
@@ -4913,6 +4912,12 @@
     function playUIClickSound() {
       if (!crowbarState.enabled) return;
       playFromPool(uiClickAudioPool, uiClickAudioState);
+    }
+
+    function playHlRefActivateSounds() {
+      playFromPool(hlRefIntroAudioPool, hlRefIntroAudioState);
+      playFromPool(hlRefAmmoAudioPool,  hlRefAmmoAudioState);
+      playFromPool(hlRefGmanAudioPool,  hlRefGmanAudioState);
     }
 
     function playHlRefBeepSound() {
@@ -5049,7 +5054,7 @@
     hlRef.addEventListener('mousedown', (event) => {
       if (event.button !== 0) return;
       activateCrowbarMode();
-      triggerCrowbarStrike('beep');
+      playHlRefActivateSounds();
       markHlRefDrop();
     });
 
@@ -5063,7 +5068,7 @@
       if (event.key !== 'Enter' && event.key !== ' ') return;
       event.preventDefault();
       activateCrowbarMode();
-      triggerCrowbarStrike('beep');
+      playHlRefActivateSounds();
       markHlRefDrop();
       handleMetroLineTrigger();
     });
