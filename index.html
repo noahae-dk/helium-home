@@ -1816,22 +1816,24 @@
 
     .headcrab-bruise {
       position: absolute;
-      width: 13px;
-      height: 8px;
-      border-radius: 50%;
-      background: radial-gradient(ellipse at 40% 40%, rgba(28, 48, 12, 0.92), rgba(10, 20, 4, 0.78));
-      box-shadow: 0 0 3px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.5);
       pointer-events: none;
       transform: translate(-50%, -50%) rotate(var(--bruise-rot));
       transform-origin: center;
-      animation: headcrabBruiseFade 4s ease-out forwards;
+      animation: headcrabBruiseFade var(--bruise-dur, 4s) ease-out forwards;
     }
     @keyframes headcrabBruiseFade {
-      0%   { opacity: 0;   transform: translate(-50%,-50%) rotate(var(--bruise-rot)) scale(0.3); }
-      7%   { opacity: 1;   transform: translate(-50%,-50%) rotate(var(--bruise-rot)) scale(1.15); }
-      14%  { opacity: 0.9; transform: translate(-50%,-50%) rotate(var(--bruise-rot)) scale(1); }
-      75%  { opacity: 0.7; }
-      100% { opacity: 0;   transform: translate(-50%,-50%) rotate(var(--bruise-rot)) scale(0.85); }
+      0%   { opacity: 0;   transform: translate(-50%,-50%) rotate(var(--bruise-rot)) scale(0.25); }
+      7%   { opacity: 1;   transform: translate(-50%,-50%) rotate(var(--bruise-rot)) scale(1.2); }
+      15%  { opacity: 0.9; transform: translate(-50%,-50%) rotate(var(--bruise-rot)) scale(1); }
+      70%  { opacity: var(--bruise-peak-op, 0.7); }
+      100% { opacity: 0;   transform: translate(-50%,-50%) rotate(var(--bruise-rot)) scale(0.82); }
+    }
+
+    body.solid-background:not(.dark-solid) .hl-ref {
+      color: rgba(18, 22, 18, 0.78);
+    }
+    body.solid-background:not(.dark-solid) .hl-ref .lambda {
+      text-shadow: 0 1px 6px rgba(0,0,0,0.20), 0 3px 12px rgba(0,0,0,0.12);
     }
 </style>
 </head>
@@ -5006,13 +5008,36 @@
         if (!found) return; // completely outside body, skip
       }
 
+      const w = 7 + Math.random() * 13;
+      const h = 4 + Math.random() * 9;
+      const radii = ['50%', '45% 55% 62% 38%', '60% 40% 48% 52%', '38% 62% 55% 45%', '52% 48% 40% 60%', '65% 35% 50% 50%'];
+      const radius = radii[Math.floor(Math.random() * radii.length)];
+      const palettes = [
+        [28, 48, 12], [38, 22, 8], [20, 18, 30], [12, 26, 8], [35, 14, 14], [22, 36, 10],
+      ];
+      const [cr, cg, cb] = palettes[Math.floor(Math.random() * palettes.length)];
+      const hiX = 28 + Math.random() * 36;
+      const hiY = 24 + Math.random() * 36;
+      const a1 = (0.82 + Math.random() * 0.16).toFixed(2);
+      const a2 = (0.60 + Math.random() * 0.18).toFixed(2);
+      const peakOp = (0.55 + Math.random() * 0.35).toFixed(2);
+      const dur = (3.0 + Math.random() * 2.2).toFixed(1);
+      const shadowBlur = (2 + Math.random() * 4).toFixed(1);
+
       const bruise = document.createElement('div');
       bruise.className = 'headcrab-bruise';
       bruise.style.left = `${(nx * 100).toFixed(1)}%`;
       bruise.style.top = `${(ny * 100).toFixed(1)}%`;
+      bruise.style.width = `${w.toFixed(1)}px`;
+      bruise.style.height = `${h.toFixed(1)}px`;
+      bruise.style.borderRadius = radius;
+      bruise.style.background = `radial-gradient(ellipse at ${hiX.toFixed(0)}% ${hiY.toFixed(0)}%, rgba(${cr+12},${cg+22},${cb+6},${a1}), rgba(${cr},${cg},${cb},${a2}))`;
+      bruise.style.boxShadow = `0 0 ${shadowBlur}px rgba(0,0,0,0.72), 0 1px 2px rgba(0,0,0,0.45)`;
       bruise.style.setProperty('--bruise-rot', `${Math.floor(Math.random() * 360)}deg`);
+      bruise.style.setProperty('--bruise-dur', `${dur}s`);
+      bruise.style.setProperty('--bruise-peak-op', peakOp);
       hlHeadcrab.appendChild(bruise);
-      setTimeout(() => { if (bruise.parentNode) bruise.remove(); }, 4200);
+      setTimeout(() => { if (bruise.parentNode) bruise.remove(); }, parseFloat(dur) * 1000 + 200);
     }
 
     let bloodParticles = [];
