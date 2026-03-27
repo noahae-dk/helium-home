@@ -4768,8 +4768,8 @@
     function positionHeadcrab() {
       const barRect = searchWrap.getBoundingClientRect();
       const size = 110;
-      // sits just below the search bar top — top 25px hide behind bar, rest hangs below
-      hlHeadcrab.style.left = (barRect.right - size - 16) + 'px';
+      const randomLeft = barRect.left + Math.random() * (barRect.width - size);
+      hlHeadcrab.style.left = randomLeft + 'px';
       hlHeadcrab.style.top  = (barRect.top + barRect.height * 0.35) + 'px';
     }
 
