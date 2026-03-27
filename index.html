@@ -4710,10 +4710,10 @@
       hlCan.classList.add('throwing');
       clearTimeout(hlCanTimer);
 
-      const duration = 780;
+      const duration = 980;
       const started = performance.now();
 
-      const baseMainBlur = 'drop-shadow(0 7px 16px rgba(0, 0, 0, 0.22))';
+      const baseMainBlur = 'drop-shadow(0 9px 20px rgba(0, 0, 0, 0.28))';
       const baseTrailBlur = 'blur(1.15px)';
 
       const render = (tRaw) => {
@@ -4721,22 +4721,22 @@
         const motionT = smoothInOutCubic(t);
         const trailT = Math.max(0, motionT - 0.085);
 
-        const x = quadraticPoint(-6, 46, 104, motionT);
-        const y = quadraticPoint(18, -58, 14, motionT);
-        const rotate = -18 + (406 * motionT);
-        const scale = 0.82 + (0.155 * Math.sin(Math.PI * motionT));
-        const fadeIn = Math.min(1, t / 0.16);
-        const fadeOut = t > 0.82 ? 1 - ((t - 0.82) / 0.18) : 1;
+        const x = quadraticPoint(-6, 72, 162, motionT);
+        const y = quadraticPoint(18, -148, 14, motionT);
+        const rotate = -18 + (420 * motionT);
+        const scale = 0.82 + (0.38 * Math.sin(Math.PI * motionT));
+        const fadeIn = Math.min(1, t / 0.14);
+        const fadeOut = t > 0.86 ? 1 - ((t - 0.86) / 0.14) : 1;
         const opacity = Math.max(0, Math.min(1, Math.pow(fadeIn, 0.82) * Math.pow(fadeOut, 1.12)));
 
-        const trailX = quadraticPoint(-11, 28, 78, trailT);
-        const trailY = quadraticPoint(20, -42, -1, trailT);
-        const trailRotate = -18 + (332 * trailT);
-        const trailScale = 0.81 + (0.12 * Math.sin(Math.PI * trailT));
-        const trailFade = t > 0.80 ? 1 - ((t - 0.80) / 0.20) : 1;
-        const trailOpacity = 0.16 * Math.pow(Math.max(0, trailFade), 1.08) * Math.sin(Math.PI * Math.min(1, trailT + 0.12));
+        const trailX = quadraticPoint(-11, 52, 122, trailT);
+        const trailY = quadraticPoint(20, -112, -1, trailT);
+        const trailRotate = -18 + (344 * trailT);
+        const trailScale = 0.81 + (0.30 * Math.sin(Math.PI * trailT));
+        const trailFade = t > 0.84 ? 1 - ((t - 0.84) / 0.16) : 1;
+        const trailOpacity = 0.26 * Math.pow(Math.max(0, trailFade), 1.08) * Math.sin(Math.PI * Math.min(1, trailT + 0.12));
 
-        const mainBlur = 0.22 + (1.05 * Math.sin(Math.PI * motionT));
+        const mainBlur = 0.18 + (1.2 * Math.sin(Math.PI * motionT));
         const trailBlur = 1.0 + (0.85 * Math.sin(Math.PI * trailT));
 
         hlCanImg.style.opacity = opacity.toFixed(3);
