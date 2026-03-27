@@ -4962,15 +4962,54 @@
       hlHeadcrab.querySelectorAll('.headcrab-bruise').forEach(el => el.remove());
     }
 
+    let headcrabPixelData = null;
+
+    function loadHeadcrabPixelData() {
+      if (headcrabPixelData) return;
+      const img = document.getElementById('hlHeadcrabImg');
+      if (!img || !img.naturalWidth) return;
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        canvas.getContext('2d').drawImage(img, 0, 0);
+        headcrabPixelData = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+      } catch(e) { headcrabPixelData = null; }
+    }
+
+    function isHeadcrabOpaque(nx, ny) {
+      if (!headcrabPixelData) return true;
+      const x = Math.floor(Math.max(0, Math.min(1, nx)) * (headcrabPixelData.width - 1));
+      const y = Math.floor(Math.max(0, Math.min(1, ny)) * (headcrabPixelData.height - 1));
+      return headcrabPixelData.data[(y * headcrabPixelData.width + x) * 4 + 3] > 20;
+    }
+
     function spawnHeadcrabBruise(mx, my) {
       const rect = hlHeadcrab.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
-      const px = ((mx - rect.left) / rect.width) * 100;
-      const py = ((my - rect.top) / rect.height) * 100;
+      loadHeadcrabPixelData();
+
+      let nx = (mx - rect.left) / rect.width;
+      let ny = (my - rect.top) / rect.height;
+      nx = Math.max(0, Math.min(1, nx));
+      ny = Math.max(0, Math.min(1, ny));
+
+      // If hit point is transparent, nudge toward body center until opaque
+      if (!isHeadcrabOpaque(nx, ny)) {
+        const cx = 0.50, cy = 0.36; // approximate body center in normalized coords
+        let found = false;
+        for (let step = 0.04; step <= 0.52; step += 0.04) {
+          const tx = nx + (cx - nx) * step;
+          const ty = ny + (cy - ny) * step;
+          if (isHeadcrabOpaque(tx, ty)) { nx = tx; ny = ty; found = true; break; }
+        }
+        if (!found) return; // completely outside body, skip
+      }
+
       const bruise = document.createElement('div');
       bruise.className = 'headcrab-bruise';
-      bruise.style.left = `${Math.max(5, Math.min(95, px)).toFixed(1)}%`;
-      bruise.style.top = `${Math.max(5, Math.min(95, py)).toFixed(1)}%`;
+      bruise.style.left = `${(nx * 100).toFixed(1)}%`;
+      bruise.style.top = `${(ny * 100).toFixed(1)}%`;
       bruise.style.setProperty('--bruise-rot', `${Math.floor(Math.random() * 360)}deg`);
       hlHeadcrab.appendChild(bruise);
       setTimeout(() => { if (bruise.parentNode) bruise.remove(); }, 4200);
