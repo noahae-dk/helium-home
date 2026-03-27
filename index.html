@@ -1693,28 +1693,31 @@
       pointer-events: none;
       opacity: 0;
       filter: blur(12px);
-      transform: rotate(-20deg) scale(0.75);
+      transform: translate3d(0, 0, 0) rotate(-20deg) scale(0.75);
+      transform-origin: 52% 42%;
       transition:
         opacity 0.5s cubic-bezier(.2,.8,.2,1),
         filter 0.5s cubic-bezier(.2,.8,.2,1),
         transform 0.5s cubic-bezier(.2,.8,.2,1);
       user-select: none;
+      backface-visibility: hidden;
+      will-change: transform, opacity, filter;
     }
 
     .hl-headcrab.is-visible {
       opacity: 1;
       filter: blur(0);
-      transform: rotate(0deg) scale(1);
+      transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
       pointer-events: auto;
       cursor: none;
     }
 
     .hl-headcrab.is-hovered {
-      transform: rotate(0deg) scale(1.10);
+      transform: translate3d(0, 0, 0) rotate(-2deg) scale(1.08);
       transition:
         opacity 0.5s cubic-bezier(.2,.8,.2,1),
         filter 0.5s cubic-bezier(.2,.8,.2,1),
-        transform 0.12s cubic-bezier(.2,.8,.2,1);
+        transform 0.14s cubic-bezier(.2,.8,.2,1);
     }
 
     .hl-headcrab.is-hit {
@@ -1737,10 +1740,10 @@
     }
 
     @keyframes headcrabHitShake {
-      0%   { transform: rotate(0deg) scale(1.10) translateX(0); }
-      25%  { transform: rotate(-7deg) scale(1.05) translateX(-7px); }
-      75%  { transform: rotate(6deg) scale(1.08) translateX(6px); }
-      100% { transform: rotate(0deg) scale(1) translateX(0); }
+      0%   { transform: translate3d(0, 0, 0) rotate(-2deg) scale(1.08); }
+      25%  { transform: translate3d(-7px, 0, 0) rotate(-7deg) scale(1.04); }
+      75%  { transform: translate3d(6px, 0, 0) rotate(5deg) scale(1.06); }
+      100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
     }
 
     .hl-headcrab img {
@@ -2381,8 +2384,9 @@
       'ask "{model}" why fire is hot…',
       'ask "{model}" what the smallest planet is…',
       'ask "{model}" how headphones make spatial audio…',
-      'ask "{model}" why Jonah is so sexy..',
-      'ask "{model}" what makes 411 so much better than Visual..',
+      'ask "{model}" why Jonah is so sexy…',
+      'ask "{model}" what makes 411 so much better than Visual…',
+      'ask "{model}" why Daniel is usually a fucking faggot…',
     ];
 
     function getRandomAIPlaceholder(modelLabel) {
@@ -4763,30 +4767,108 @@
       hlRef.classList.remove('is-armed', 'is-speaking', 'is-exhausted', 'is-dropping', 'is-mode-shifting');
     }
 
-    const headcrabState = { hits: 0, alive: false };
+    const headcrabState = { hits: 0, alive: false, idlePlayed: false, revealTimer: 0, deathAnimation: null, horizontalOffset: null };
+
+    function randomizeHeadcrabHorizontalOffset() {
+      headcrabState.horizontalOffset = Math.round((Math.random() - 0.5) * 52);
+    }
 
     function positionHeadcrab() {
-      const barRect = searchWrap.getBoundingClientRect();
-      const size = 110;
-      const randomLeft = barRect.left + Math.random() * (barRect.width - size);
-      hlHeadcrab.style.left = randomLeft + 'px';
-      hlHeadcrab.style.top  = (barRect.top + barRect.height * 0.35) + 'px';
+      const barRect = form.getBoundingClientRect();
+      const inputRect = input.getBoundingClientRect();
+      const crabRect = hlHeadcrab.getBoundingClientRect();
+      const crabWidth = crabRect.width || 110;
+      const crabHeight = crabRect.height || ((crabWidth / 474) * 207);
+
+      // Visually: the headcrab should sit ABOVE the search bar.
+      // Layering: it should still be UNDER the search bar element.
+      // So only the bottom ~18% of the crab should tuck behind the bar.
+      const rightInset = Math.round(Math.max(40, Math.min(72, crabWidth * 0.6)));
+      const tuckedUnderBar = crabHeight * 0.18;
+      const crabTop = Math.round(barRect.top - crabHeight + tuckedUnderBar);
+
+      if (headcrabState.horizontalOffset == null) {
+        randomizeHeadcrabHorizontalOffset();
+      }
+
+      const baseLeft = inputRect.right - crabWidth - rightInset;
+      const minLeft = inputRect.left + 14;
+      const maxLeft = inputRect.right - crabWidth - 14;
+      const crabLeft = Math.max(minLeft, Math.min(maxLeft, baseLeft + headcrabState.horizontalOffset));
+
+      hlHeadcrab.style.left = Math.round(crabLeft) + 'px';
+      hlHeadcrab.style.top  = crabTop + 'px';
+    }
+
+    function stopHeadcrabDeathAnimation() {
+      if (headcrabState.deathAnimation) {
+        headcrabState.deathAnimation.cancel();
+        headcrabState.deathAnimation = null;
+      }
+    }
+
+    function playHeadcrabDeathAnimation() {
+      stopHeadcrabDeathAnimation();
+      hlHeadcrab.classList.remove('is-hit', 'is-hovered');
+      hlHeadcrab.classList.add('is-dying');
+      hlHeadcrab.style.opacity = '1';
+      hlHeadcrab.style.filter = 'blur(0px)';
+      hlHeadcrab.style.transform = 'translate3d(0, 0, 0) rotate(0deg) scale(1)';
+
+      const animation = hlHeadcrab.animate([
+        { transform: 'translate3d(0, 0, 0) rotate(0deg) scale(1)', opacity: 1, filter: 'blur(0px)', offset: 0 },
+        { transform: 'translate3d(-6px, -10px, 0) rotate(-8deg) scale(1.03)', opacity: 1, filter: 'blur(0px)', offset: 0.12 },
+        { transform: 'translate3d(4px, 4px, 0) rotate(18deg) scale(1.01)', opacity: 0.99, filter: 'blur(0.25px)', offset: 0.34 },
+        { transform: 'translate3d(9px, 18px, 0) rotate(42deg) scale(0.98)', opacity: 0.95, filter: 'blur(0.9px)', offset: 0.58 },
+        { transform: 'translate3d(13px, 34px, 0) rotate(64deg) scale(0.94)', opacity: 0.72, filter: 'blur(2.2px)', offset: 0.82 },
+        { transform: 'translate3d(16px, 52px, 0) rotate(80deg) scale(0.9)', opacity: 0, filter: 'blur(5px)', offset: 1 }
+      ], {
+        duration: 1220,
+        easing: 'cubic-bezier(0.22, 0.7, 0.2, 1)',
+        fill: 'forwards'
+      });
+
+      headcrabState.deathAnimation = animation;
+      animation.onfinish = () => {
+        if (headcrabState.deathAnimation !== animation) return;
+        headcrabState.deathAnimation = null;
+        hlHeadcrab.classList.remove('is-visible', 'is-dying', 'is-hit', 'is-hovered');
+        hlHeadcrab.style.opacity = '';
+        hlHeadcrab.style.filter = '';
+        hlHeadcrab.style.transform = '';
+      };
+      animation.oncancel = () => {
+        if (headcrabState.deathAnimation === animation) {
+          headcrabState.deathAnimation = null;
+        }
+      };
     }
 
     function showHeadcrab() {
+      window.clearTimeout(headcrabState.revealTimer);
+      stopHeadcrabDeathAnimation();
       headcrabState.hits = 0;
       headcrabState.alive = true;
       headcrabState.idlePlayed = false;
-      hlHeadcrab.classList.remove('is-dying', 'is-hovered', 'is-hit');
+      randomizeHeadcrabHorizontalOffset();
+      hlHeadcrab.classList.remove('is-dying', 'is-hovered', 'is-hit', 'is-visible');
+      hlHeadcrab.style.opacity = '';
+      hlHeadcrab.style.filter = '';
+      hlHeadcrab.style.transform = '';
       positionHeadcrab();
-      setTimeout(() => {
+      headcrabState.revealTimer = window.setTimeout(() => {
         hlHeadcrab.classList.add('is-visible');
       }, 300);
     }
 
     function hideHeadcrab() {
+      window.clearTimeout(headcrabState.revealTimer);
+      stopHeadcrabDeathAnimation();
       headcrabState.alive = false;
       hlHeadcrab.classList.remove('is-visible', 'is-hovered', 'is-hit', 'is-dying');
+      hlHeadcrab.style.opacity = '';
+      hlHeadcrab.style.filter = '';
+      hlHeadcrab.style.transform = '';
     }
 
     let bloodParticles = [];
@@ -4852,11 +4934,7 @@
       if (headcrabState.hits >= 3) {
         headcrabState.alive = false;
         playFromPool(headcrabDieAudioPool, headcrabDieAudioState);
-        hlHeadcrab.classList.remove('is-hovered');
-        hlHeadcrab.classList.add('is-dying');
-        setTimeout(() => {
-          hlHeadcrab.classList.remove('is-visible', 'is-dying', 'is-hit');
-        }, 600);
+        playHeadcrabDeathAnimation();
       }
     }
 
@@ -5134,6 +5212,9 @@
       if (!crowbarState.enabled) {
         crowbarState.prevMouseX = crowbarState.mouseX;
         crowbarState.prevMouseY = crowbarState.mouseY;
+      }
+      if (crowbarState.enabled && (headcrabState.alive || hlHeadcrab.classList.contains('is-visible'))) {
+        positionHeadcrab();
       }
     });
 
