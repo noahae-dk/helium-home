@@ -4920,6 +4920,9 @@
       if (headcrabState.hits >= 3) {
         headcrabState.alive = false;
         playFromPool(headcrabDieAudioPool, headcrabDieAudioState);
+        if (Math.random() < 0.1) {
+          playFromPool(bugreporterAudioPool, bugreporterAudioState);
+        }
         playHeadcrabDeathAnimation();
       }
     }
@@ -4996,9 +4999,6 @@
         playHlRefBeepSound();
       } else {
         playCrowbarHitSound();
-        if (Math.random() < 0.1) {
-          playFromPool(bugreporterAudioPool, bugreporterAudioState);
-        }
       }
     }
 
