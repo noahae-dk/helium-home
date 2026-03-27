@@ -4619,6 +4619,7 @@
     }
 
     function markHlRefDrop() {
+      if (exhaustedCrowbarLines) return;
       hlRef.classList.remove('is-dropping');
       void hlRef.offsetWidth;
       hlRef.classList.add('is-dropping');
