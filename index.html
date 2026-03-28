@@ -1895,7 +1895,7 @@
     <div class="weather-line" id="weatherLine">Henter vejr i København…</div>
 
     <div class="search-wrap">
-      <div class="search-greeting" id="searchGreeting" aria-hidden="true"></div>
+      <div class="search-greeting is-hidden" id="searchGreeting" aria-hidden="true"></div>
       <div class="mode-sparkles" id="modeSparkles" aria-hidden="true"></div>
       <form class="search-form" id="searchForm">
         <input
@@ -2021,6 +2021,11 @@
       "Hvad vil du udforske i dag?",
     ];
     searchGreeting.textContent = greetingMessages[Math.floor(Math.random() * greetingMessages.length)];
+    let greetingRevealed = false;
+    setTimeout(() => {
+      greetingRevealed = true;
+      if (!isJoshMode()) searchGreeting.classList.remove('is-hidden');
+    }, 120);
 
     const danishDays = ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'];
     const danishMonths = ['Januar', 'Februar', 'Marts', 'April', 'Maj', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'December'];
@@ -2313,7 +2318,7 @@
       clock.classList.toggle('is-hidden', !showClock);
       dateElement.classList.toggle('is-hidden', !showDate);
       weatherLine.classList.toggle('is-hidden', !showWeather || josh);
-      searchGreeting.classList.toggle('is-hidden', josh);
+      if (greetingRevealed) searchGreeting.classList.toggle('is-hidden', josh);
       clockToggleItem.classList.toggle('is-on', showClock);
       dateToggleItem.classList.toggle('is-on', showDate);
       weatherToggleItem.classList.toggle('is-on', showWeather);
