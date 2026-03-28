@@ -4611,6 +4611,10 @@
       createAudioPool('./cbar_hitbod3.wav', 0.10, 2),
     ];
     const headcrabDieAudioPool = createAudioPool('./die1.wav', 0.10, 2);
+    const gmanChooseLines = [
+      { src: './gman_choose1.wav', text: 'Time to choose...',    audio: (() => { const a = new Audio('./gman_choose1.wav'); a.preload='auto'; a.volume=0.18; return a; })() },
+      { src: './gman_choose2.wav', text: "It's time to choose.", audio: (() => { const a = new Audio('./gman_choose2.wav'); a.preload='auto'; a.volume=0.18; return a; })() },
+    ];
 
     const headcrabIdleAudioState   = { index: 0 };
     const headcrabAttackAudioState = { index: 0 };
@@ -4693,6 +4697,9 @@
     let postMetroLineIndex = 0;
     let postMetroPressCount = 0;
     let nextPostMetroTriggerPress = getNextPostMetroTriggerPress();
+    let gmanLineIndex = 0;
+    let gmanPressCount = 0;
+    let nextGmanTriggerPress = getNextPostMetroTriggerPress();
     let activeMetroAudio = null;
     let metroBusy = false;
     let metroCooldownUntil = 0;
@@ -4892,6 +4899,9 @@
       postMetroLineIndex = 0;
       postMetroPressCount = 0;
       nextPostMetroTriggerPress = getNextPostMetroTriggerPress();
+      gmanLineIndex = 0;
+      gmanPressCount = 0;
+      nextGmanTriggerPress = getNextPostMetroTriggerPress();
       exhaustedCrowbarLines = false;
       clearTimeout(hlDropTimer);
       clearTimeout(hlShiftTimer);
@@ -5369,38 +5379,42 @@
         }
         playLine(line, () => {
           metroLineIndex += 1;
-          if (metroLineIndex >= metroDispatchLines.length && postMetroLineIndex >= postMetroDispatchLines.length) {
+          hlRef.classList.remove('is-exhausted');
+        });
+        return;
+      }
+
+      if (postMetroLineIndex < postMetroDispatchLines.length) {
+        postMetroPressCount += 1;
+        if (postMetroPressCount < nextPostMetroTriggerPress) return;
+        const line = postMetroDispatchLines[postMetroLineIndex];
+        playLine(line, () => {
+          postMetroLineIndex += 1;
+          postMetroPressCount = 0;
+          nextPostMetroTriggerPress = getNextPostMetroTriggerPress();
+        });
+        return;
+      }
+
+      // Gman phase — plays after all metro cop lines, same random 5-10 click wait
+      if (gmanLineIndex < gmanChooseLines.length) {
+        gmanPressCount += 1;
+        if (gmanPressCount < nextGmanTriggerPress) return;
+        const line = gmanChooseLines[gmanLineIndex];
+        playLine(line, () => {
+          gmanLineIndex += 1;
+          gmanPressCount = 0;
+          nextGmanTriggerPress = getNextPostMetroTriggerPress();
+          if (gmanLineIndex >= gmanChooseLines.length) {
             exhaustedCrowbarLines = true;
             hlRef.classList.add('is-exhausted');
-          } else {
-            hlRef.classList.remove('is-exhausted');
           }
         });
         return;
       }
 
-      if (postMetroLineIndex >= postMetroDispatchLines.length) {
-        exhaustedCrowbarLines = true;
-        hlRef.classList.add('is-exhausted');
-        return;
-      }
-
-      postMetroPressCount += 1;
-      if (postMetroPressCount < nextPostMetroTriggerPress) {
-        return;
-      }
-
-      const line = postMetroDispatchLines[postMetroLineIndex];
-      playLine(line, () => {
-        postMetroLineIndex += 1;
-        postMetroPressCount = 0;
-        nextPostMetroTriggerPress = getNextPostMetroTriggerPress();
-
-        if (postMetroLineIndex >= postMetroDispatchLines.length) {
-          exhaustedCrowbarLines = true;
-          hlRef.classList.add('is-exhausted');
-        }
-      });
+      exhaustedCrowbarLines = true;
+      hlRef.classList.add('is-exhausted');
     }
 
     hlRef.addEventListener('mousedown', (event) => {
@@ -5408,7 +5422,7 @@
       activateCrowbarMode();
       playHlRefActivateSounds();
       markHlRefDrop();
-      triggerCrowbarStrike('beep');
+      triggerCrowbarStrike('silent');
     });
 
     hlRef.addEventListener('click', (event) => {
