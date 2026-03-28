@@ -2008,23 +2008,22 @@
     const weatherLine = document.getElementById('weatherLine');
     const searchGreeting = document.getElementById('searchGreeting');
 
-    const greetingMessages = [
-      "Hvad kan jeg hjælpe dig med i dag?",
-      "Klar til at søge. Hvad leder du efter?",
-      "Hvad har du på hjerte?",
-      "Hvad tænker du på?",
-      "Hvad vil du gerne finde?",
-      "Hvad kan vi finde frem til dig?",
-      "Klar — hvad søger du efter?",
-      "Hvad vil du vide mere om?",
-      "Hvad er på din søgeliste?",
-      "Hvad vil du udforske i dag?",
-    ];
-    searchGreeting.textContent = greetingMessages[Math.floor(Math.random() * greetingMessages.length)];
+    function getGreetingMessage() {
+      if (Math.random() < 0.22) return '✳ Velkommen tilbage, Noah.';
+      const h = new Date().getHours();
+      if (h >= 5  && h < 11) return '✳ Godmorgen, Noah.';
+      if (h >= 11 && h < 17) return '✳ God eftermiddag, Noah.';
+      if (h >= 17 && h < 22) return '✳ Godaften, Noah.';
+      if (h >= 22 || h < 2)  return '✳ Det er sen-aften Noah.';
+      return '✳ Er du stadig oppe, Noah?';
+    }
+    searchGreeting.textContent = getGreetingMessage();
+
     let greetingRevealed = false;
+    let greetingHiddenByHeadcrab = false;
     setTimeout(() => {
       greetingRevealed = true;
-      if (!isJoshMode()) searchGreeting.classList.remove('is-hidden');
+      if (!isJoshMode() && !greetingHiddenByHeadcrab) searchGreeting.classList.remove('is-hidden');
     }, 120);
 
     const danishDays = ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'];
@@ -2318,7 +2317,7 @@
       clock.classList.toggle('is-hidden', !showClock);
       dateElement.classList.toggle('is-hidden', !showDate);
       weatherLine.classList.toggle('is-hidden', !showWeather || josh);
-      if (greetingRevealed) searchGreeting.classList.toggle('is-hidden', josh);
+      if (greetingRevealed) searchGreeting.classList.toggle('is-hidden', josh || greetingHiddenByHeadcrab);
       clockToggleItem.classList.toggle('is-on', showClock);
       dateToggleItem.classList.toggle('is-on', showDate);
       weatherToggleItem.classList.toggle('is-on', showWeather);
@@ -5080,6 +5079,7 @@
         hlHeadcrab.style.filter = '';
         hlHeadcrab.style.transform = '';
         setTimeout(() => {
+          greetingHiddenByHeadcrab = false;
           if (!isJoshMode()) searchGreeting.classList.remove('is-hidden');
         }, 400);
       };
@@ -5102,7 +5102,8 @@
       hlHeadcrab.style.filter = '';
       hlHeadcrab.style.transform = '';
       positionHeadcrab();
-      if (!isJoshMode()) searchGreeting.classList.add('is-hidden');
+      greetingHiddenByHeadcrab = true;
+      searchGreeting.classList.add('is-hidden');
       headcrabState.revealTimer = window.setTimeout(() => {
         hlHeadcrab.classList.add('is-visible');
       }, 300);
@@ -5117,6 +5118,7 @@
       hlHeadcrab.style.filter = '';
       hlHeadcrab.style.transform = '';
       hlHeadcrab.querySelectorAll('.headcrab-bruise').forEach(el => el.remove());
+      greetingHiddenByHeadcrab = false;
       if (!isJoshMode()) searchGreeting.classList.remove('is-hidden');
     }
 
