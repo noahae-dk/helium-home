@@ -218,7 +218,18 @@
       }
     }
 
-.clock,
+    #rainCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+
+    .clock,
     .date,
     .weather-line,
     .search-wrap {
@@ -1840,6 +1851,7 @@
 <body>
   <div class="overlay">
     <div class="ambient-particles" id="ambientParticles" aria-hidden="true"></div>
+  <canvas id="rainCanvas" aria-hidden="true"></canvas>
     <div class="clock" id="clock">00:00:00</div>
     <div class="date" id="date">Onsdag, 25, Marts</div>
     <div class="weather-line" id="weatherLine">Henter vejr i København…</div>
@@ -2170,6 +2182,12 @@
         document.body.style.backgroundColor = '#ffffff';
         document.body.style.backgroundImage = 'none';
         document.body.classList.add('solid-background');
+      }
+
+      if (selected.key === 'wallpaper-1' || selected.key === 'wallpaper-2') {
+        startRain();
+      } else {
+        stopRain();
       }
 
       try {
@@ -2776,6 +2794,71 @@
         ambientParticles.appendChild(particle);
       }
     }
+
+    // ── Rain effect ─────────────────────────────────────────────────────
+    const rainCanvas = document.getElementById('rainCanvas');
+    const rainCtx = rainCanvas.getContext('2d');
+    const rainDrops = [];
+    let rainRaf = 0;
+    let rainActive = false;
+
+    function resizeRainCanvas() {
+      rainCanvas.width = window.innerWidth;
+      rainCanvas.height = window.innerHeight;
+    }
+
+    function makeRainDrop(atTop) {
+      return {
+        x: Math.random() * (window.innerWidth + 80),
+        y: atTop ? -4 - Math.random() * 40 : Math.random() * window.innerHeight,
+        len: 9 + Math.random() * 15,
+        speed: 4.5 + Math.random() * 6.5,
+        opacity: 0.04 + Math.random() * 0.09,
+        width: 0.4 + Math.random() * 0.65,
+        lean: 0.10 + Math.random() * 0.10,
+      };
+    }
+
+    function initRainDrops() {
+      rainDrops.length = 0;
+      for (let i = 0; i < 140; i++) rainDrops.push(makeRainDrop(false));
+    }
+
+    function animateRain() {
+      if (!rainActive) { rainRaf = 0; return; }
+      rainCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
+      for (const d of rainDrops) {
+        rainCtx.beginPath();
+        rainCtx.strokeStyle = `rgba(200,224,248,${d.opacity.toFixed(3)})`;
+        rainCtx.lineWidth = d.width;
+        rainCtx.moveTo(d.x, d.y);
+        rainCtx.lineTo(d.x + d.len * d.lean, d.y + d.len);
+        rainCtx.stroke();
+        d.x += d.speed * d.lean;
+        d.y += d.speed;
+        if (d.y > rainCanvas.height + d.len) {
+          Object.assign(d, makeRainDrop(true));
+        }
+      }
+      rainRaf = requestAnimationFrame(animateRain);
+    }
+
+    function startRain() {
+      if (rainActive) return;
+      rainActive = true;
+      resizeRainCanvas();
+      initRainDrops();
+      if (!rainRaf) animateRain();
+      rainCanvas.style.opacity = '1';
+    }
+
+    function stopRain() {
+      rainActive = false;
+      rainCanvas.style.opacity = '0';
+    }
+
+    window.addEventListener('resize', resizeRainCanvas);
+    // ────────────────────────────────────────────────────────────────────
 
     function hideSuggestions() {
       clearTimeout(suggestionHideTimer);
