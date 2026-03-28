@@ -5242,6 +5242,7 @@
       if (!crowbarState.enabled) return;
       const i = Math.floor(Math.random() * uiClickAudioPools.length);
       playFromPool(uiClickAudioPools[i], uiClickAudioStates[i]);
+      triggerCrowbarStrike('beep');
     }
 
     function playHlRefActivateSounds() {
@@ -5406,6 +5407,7 @@
       activateCrowbarMode();
       playHlRefActivateSounds();
       markHlRefDrop();
+      triggerCrowbarStrike('beep');
     });
 
     hlRef.addEventListener('click', (event) => {
