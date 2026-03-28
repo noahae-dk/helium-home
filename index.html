@@ -2805,27 +2805,36 @@
       rainCanvas.height = window.innerHeight;
     }
 
-    function makeRainDrop(atTop) {
-      return {
-        x: Math.random() * (window.innerWidth + 120),
-        y: atTop ? -6 - Math.random() * 50 : Math.random() * window.innerHeight,
-        len: 14 + Math.random() * 22,
-        speed: 5 + Math.random() * 8,
-        opacity: 0.12 + Math.random() * 0.18,
-        width: 0.55 + Math.random() * 0.85,
-        lean: 0.10 + Math.random() * 0.10,
-      };
+    // Seed-based drop: each index always has the same intrinsic properties,
+    // and its y-position is derived from Date.now() so it looks mid-stream
+    // on every page load (same approach as ambient particles).
+    function makeRainDrop(i) {
+      const len    = 12 + seededUnit(i, 1) * 20;
+      const speed  =  5 + seededUnit(i, 2) * 8;
+      const lean   = 0.10 + seededUnit(i, 3) * 0.10;
+      const op     = 0.06 + seededUnit(i, 4) * 0.08;
+      const width  = 0.5  + seededUnit(i, 5) * 0.75;
+      const baseX  = seededUnit(i, 6) * (window.innerWidth + 120);
+
+      // How long (ms) one full top→bottom cycle takes at ~60fps
+      const totalPx = window.innerHeight + len * 2;
+      const cycleMs = (totalPx / speed) * (1000 / 60);
+      const phase   = Date.now() % cycleMs;
+      const progress = phase / cycleMs;
+      const y = -len + progress * totalPx;
+      const x = baseX + (y + len) * lean;
+
+      return { x, y, len, speed, op, width, lean };
     }
 
-    (function initRainDrops() {
-      for (let i = 0; i < 180; i++) rainDrops.push(makeRainDrop(false));
-    })();
+    resizeRainCanvas();
+    for (let i = 0; i < 170; i++) rainDrops.push(makeRainDrop(i));
 
     function animateRain() {
       rainCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
       for (const d of rainDrops) {
         rainCtx.beginPath();
-        rainCtx.strokeStyle = `rgba(200,224,250,${d.opacity.toFixed(3)})`;
+        rainCtx.strokeStyle = `rgba(200,224,250,${d.op.toFixed(3)})`;
         rainCtx.lineWidth = d.width;
         rainCtx.moveTo(d.x, d.y);
         rainCtx.lineTo(d.x + d.len * d.lean, d.y + d.len);
@@ -2833,7 +2842,8 @@
         d.x += d.speed * d.lean;
         d.y += d.speed;
         if (d.y > rainCanvas.height + d.len) {
-          Object.assign(d, makeRainDrop(true));
+          d.y = -d.len;
+          d.x -= (rainCanvas.height + d.len * 2) * d.lean;
         }
       }
       requestAnimationFrame(animateRain);
@@ -2842,7 +2852,6 @@
     function showRain() { rainCanvas.style.opacity = '1'; }
     function hideRain() { rainCanvas.style.opacity = '0'; }
 
-    resizeRainCanvas();
     animateRain();
     window.addEventListener('resize', resizeRainCanvas);
     // ────────────────────────────────────────────────────────────────────
