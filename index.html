@@ -1993,6 +1993,10 @@
         <span class="settings-item-label">Weather</span>
         <span class="settings-toggle"></span>
       </li>
+      <li class="settings-item is-on" id="greetingToggleItem" role="option">
+        <span class="settings-item-label">Message</span>
+        <span class="settings-toggle"></span>
+      </li>
       <li class="settings-item" id="joshModeToggleItem" role="option">
         <span class="settings-item-label">Josh Mode</span>
         <span class="settings-toggle"></span>
@@ -2023,7 +2027,8 @@
     let greetingHiddenByHeadcrab = false;
     setTimeout(() => {
       greetingRevealed = true;
-      if (!isJoshMode() && !greetingHiddenByHeadcrab) searchGreeting.classList.remove('is-hidden');
+      const showGreetingPref = (() => { try { const s = localStorage.getItem('heliumShowGreeting'); return s === null ? true : s === 'true'; } catch(e) { return true; } })();
+      if (showGreetingPref && !isJoshMode() && !greetingHiddenByHeadcrab) searchGreeting.classList.remove('is-hidden');
     }, 120);
 
     const danishDays = ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'];
@@ -2168,6 +2173,7 @@
     const clockToggleItem = document.getElementById('clockToggleItem');
     const dateToggleItem = document.getElementById('dateToggleItem');
     const weatherToggleItem = document.getElementById('weatherToggleItem');
+    const greetingToggleItem = document.getElementById('greetingToggleItem');
     const joshModeToggleItem = document.getElementById('joshModeToggleItem');
     const aiPicker = document.getElementById('aiPicker');
     const aiTrigger = document.getElementById('aiTrigger');
@@ -2314,14 +2320,23 @@
 
       const josh = isJoshMode();
 
+      const showGreeting = (() => {
+        try {
+          const saved = localStorage.getItem('heliumShowGreeting');
+          return saved === null ? true : saved === 'true';
+        } catch (error) { return true; }
+      })();
+
       clock.classList.toggle('is-hidden', !showClock);
       dateElement.classList.toggle('is-hidden', !showDate);
       weatherLine.classList.toggle('is-hidden', !showWeather || josh);
-      if (greetingRevealed) searchGreeting.classList.toggle('is-hidden', josh || greetingHiddenByHeadcrab);
+      if (greetingRevealed) searchGreeting.classList.toggle('is-hidden', !showGreeting || josh || greetingHiddenByHeadcrab);
       clockToggleItem.classList.toggle('is-on', showClock);
       dateToggleItem.classList.toggle('is-on', showDate);
       weatherToggleItem.classList.toggle('is-on', showWeather);
       weatherToggleItem.classList.toggle('is-disabled', josh);
+      greetingToggleItem.classList.toggle('is-on', showGreeting);
+      greetingToggleItem.classList.toggle('is-disabled', josh);
       joshModeToggleItem.classList.toggle('is-on', josh);
 
       updateDateTime();
@@ -2340,6 +2355,13 @@
         localStorage.setItem('heliumShowDate', String(!!isVisible));
       } catch (error) {
       }
+      applyClockDateVisibility();
+    }
+
+    function setGreetingVisibility(isVisible) {
+      try {
+        localStorage.setItem('heliumShowGreeting', String(!!isVisible));
+      } catch (error) {}
       applyClockDateVisibility();
     }
 
@@ -4487,6 +4509,12 @@
       setWeatherVisibility(!weatherToggleItem.classList.contains('is-on'));
     });
 
+    greetingToggleItem.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+      playUIClickSound();
+      setGreetingVisibility(!greetingToggleItem.classList.contains('is-on'));
+    });
+
     joshModeToggleItem.addEventListener('mousedown', (event) => {
       event.preventDefault();
       playUIClickSound();
@@ -5523,6 +5551,7 @@
       '#clockToggleItem',
       '#dateToggleItem',
       '#weatherToggleItem',
+      '#greetingToggleItem',
       '#hlHeadcrab',
       '.suggestion-item',
       '.engine-option',
