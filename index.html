@@ -2185,9 +2185,9 @@
       }
 
       if (selected.key === 'wallpaper-1' || selected.key === 'wallpaper-2') {
-        startRain();
+        showRain();
       } else {
-        stopRain();
+        hideRain();
       }
 
       try {
@@ -2799,8 +2799,6 @@
     const rainCanvas = document.getElementById('rainCanvas');
     const rainCtx = rainCanvas.getContext('2d');
     const rainDrops = [];
-    let rainRaf = 0;
-    let rainActive = false;
 
     function resizeRainCanvas() {
       rainCanvas.width = window.innerWidth;
@@ -2809,27 +2807,25 @@
 
     function makeRainDrop(atTop) {
       return {
-        x: Math.random() * (window.innerWidth + 80),
-        y: atTop ? -4 - Math.random() * 40 : Math.random() * window.innerHeight,
-        len: 9 + Math.random() * 15,
-        speed: 4.5 + Math.random() * 6.5,
-        opacity: 0.04 + Math.random() * 0.09,
-        width: 0.4 + Math.random() * 0.65,
+        x: Math.random() * (window.innerWidth + 120),
+        y: atTop ? -6 - Math.random() * 50 : Math.random() * window.innerHeight,
+        len: 14 + Math.random() * 22,
+        speed: 5 + Math.random() * 8,
+        opacity: 0.12 + Math.random() * 0.18,
+        width: 0.55 + Math.random() * 0.85,
         lean: 0.10 + Math.random() * 0.10,
       };
     }
 
-    function initRainDrops() {
-      rainDrops.length = 0;
-      for (let i = 0; i < 140; i++) rainDrops.push(makeRainDrop(false));
-    }
+    (function initRainDrops() {
+      for (let i = 0; i < 180; i++) rainDrops.push(makeRainDrop(false));
+    })();
 
     function animateRain() {
-      if (!rainActive) { rainRaf = 0; return; }
       rainCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
       for (const d of rainDrops) {
         rainCtx.beginPath();
-        rainCtx.strokeStyle = `rgba(200,224,248,${d.opacity.toFixed(3)})`;
+        rainCtx.strokeStyle = `rgba(200,224,250,${d.opacity.toFixed(3)})`;
         rainCtx.lineWidth = d.width;
         rainCtx.moveTo(d.x, d.y);
         rainCtx.lineTo(d.x + d.len * d.lean, d.y + d.len);
@@ -2840,23 +2836,14 @@
           Object.assign(d, makeRainDrop(true));
         }
       }
-      rainRaf = requestAnimationFrame(animateRain);
+      requestAnimationFrame(animateRain);
     }
 
-    function startRain() {
-      if (rainActive) return;
-      rainActive = true;
-      resizeRainCanvas();
-      initRainDrops();
-      if (!rainRaf) animateRain();
-      rainCanvas.style.opacity = '1';
-    }
+    function showRain() { rainCanvas.style.opacity = '1'; }
+    function hideRain() { rainCanvas.style.opacity = '0'; }
 
-    function stopRain() {
-      rainActive = false;
-      rainCanvas.style.opacity = '0';
-    }
-
+    resizeRainCanvas();
+    animateRain();
     window.addEventListener('resize', resizeRainCanvas);
     // ────────────────────────────────────────────────────────────────────
 
