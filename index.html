@@ -1998,7 +1998,7 @@
         <span class="settings-toggle"></span>
       </li>
       <li class="settings-item" id="joshModeToggleItem" role="option">
-        <span class="settings-item-label">Josh Mode</span>
+        <span class="settings-item-label">US Mode</span>
         <span class="settings-toggle"></span>
       </li>
     </ul>
@@ -2183,8 +2183,8 @@
 
 
     const wallpapers = [
-      { key: 'solid-white', label: 'Solid White', file: '' },
       { key: 'solid-black', label: 'Solid Black', file: '' },
+      { key: 'solid-white', label: 'Solid White', file: '' },
       { key: 'wallpaper-1', label: 'Image #1', file: 'tlou wallpaper 2 helium.png' },
       { key: 'wallpaper-2', label: 'Image #2', file: 'tlou wallpaper 3 helium.png' }
     ];
@@ -2268,9 +2268,10 @@
 
     function isJoshMode() {
       try {
-        return localStorage.getItem('heliumJoshMode') === 'true';
+        const saved = localStorage.getItem('heliumJoshMode');
+        return saved === null ? true : saved === 'true';
       } catch (e) {
-        return false;
+        return true;
       }
     }
 
