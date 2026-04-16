@@ -884,7 +884,73 @@
       transform: translateX(2px);
     }
 
-    .search-input {
+    .suggestion-item.is-history {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-right: 8px;
+    }
+
+    .suggestion-history-icon {
+      flex: 0 0 18px;
+      width: 18px;
+      height: 18px;
+      opacity: 0.7;
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .suggestion-history-text {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .suggestion-remove {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.62);
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      opacity: 0;
+      transform: scale(0.85);
+      transition: opacity 0.18s ease, transform 0.18s ease, background 0.16s ease, color 0.16s ease;
+    }
+
+    .suggestion-item.is-history:hover .suggestion-remove,
+    .suggestion-item.is-history.active .suggestion-remove {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .suggestion-remove:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: white;
+    }
+
+    .suggestion-item.is-removing {
+      opacity: 0;
+      transform: translateX(-12px) scale(0.96);
+      transition: opacity 0.22s ease, transform 0.22s cubic-bezier(.2, .8, .2, 1), max-height 0.24s ease, padding 0.24s ease, margin 0.24s ease;
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+.search-input {
       position: relative;
       z-index: 1;
       flex: 1;
@@ -3177,6 +3243,61 @@
       return 'https://' + query;
     }
 
+    const SEARCH_HISTORY_KEY = 'heliumSearchHistory';
+    const SEARCH_HISTORY_MAX = 5;
+
+    function getSearchHistory() {
+      try {
+        const raw = localStorage.getItem(SEARCH_HISTORY_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed.filter((s) => typeof s === 'string' && s.trim()).slice(0, SEARCH_HISTORY_MAX) : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveSearchHistory(list) {
+      try {
+        localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(list.slice(0, SEARCH_HISTORY_MAX)));
+      } catch (error) {}
+    }
+
+    function addSearchHistory(query) {
+      const clean = String(query || '').trim();
+      if (!clean) return;
+      const existing = getSearchHistory().filter((item) => item.toLowerCase() !== clean.toLowerCase());
+      existing.unshift(clean);
+      saveSearchHistory(existing);
+    }
+
+    function removeSearchHistoryAt(index) {
+      const list = getSearchHistory();
+      if (index < 0 || index >= list.length) return;
+      list.splice(index, 1);
+      saveSearchHistory(list);
+    }
+
+    function clearSearchHistory() {
+      saveSearchHistory([]);
+    }
+
+    const RESOLUTION_SHORTCUTS = [
+      { regex: /\s+4k$/i,    replacement: 'imagesize:3840x2160 !g' },
+      { regex: /\s+2k$/i,    replacement: 'imagesize:2560x1440 !g' },
+      { regex: /\s+1080p$/i, replacement: 'imagesize:1920x1080 !g' }
+    ];
+
+    function transformSearchQuery(query) {
+      const text = String(query || '').trim();
+      for (const shortcut of RESOLUTION_SHORTCUTS) {
+        if (shortcut.regex.test(text)) {
+          return text.replace(shortcut.regex, ' ' + shortcut.replacement);
+        }
+      }
+      return text;
+    }
+
     function performSearch(query) {
       const cleanQuery = String(query || '').trim();
       if (!cleanQuery) return;
@@ -3189,8 +3310,11 @@
         return;
       }
 
+      addSearchHistory(cleanQuery);
+      const finalQuery = transformSearchQuery(cleanQuery);
+
       const selectedEngine = searchEngines[currentEngine] || searchEngines.google;
-      const url = `${selectedEngine.searchUrl}${encodeURIComponent(cleanQuery)}`;
+      const url = `${selectedEngine.searchUrl}${encodeURIComponent(finalQuery)}`;
       window.location.href = url;
     }
 
@@ -3259,6 +3383,7 @@
       clearTimeout(suggestionHideTimer);
       currentSuggestions = items.slice(0, 8);
       activeIndex = -1;
+      suggestions.dataset.kind = 'live';
 
       if (!currentSuggestions.length) {
         hideSuggestions();
@@ -3274,7 +3399,46 @@
       });
 
       suggestions.innerHTML = currentSuggestions
-        .map((item, index) => '<li class="suggestion-item" data-index="' + index + '">' + item + '</li>')
+        .map((item, index) => '<li class="suggestion-item" data-index="' + index + '">' + escapeHistoryHtml(item) + '</li>')
+        .join('');
+
+      requestAnimationFrame(() => {
+        suggestions.classList.add('visible');
+      });
+    }
+
+    function escapeHistoryHtml(text) {
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    const HISTORY_ICON_SVG = '<svg class="suggestion-history-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/><polyline points="12 7 12 12 15 14"/></svg>';
+
+    function showHistorySuggestions() {
+      clearTimeout(suggestionHideTimer);
+      suggestionRequestToken++;
+      const history = getSearchHistory();
+      if (!history.length) {
+        hideSuggestions();
+        return;
+      }
+
+      currentSuggestions = history.slice(0, SEARCH_HISTORY_MAX);
+      activeIndex = -1;
+      suggestions.dataset.kind = 'history';
+
+      suggestions.innerHTML = currentSuggestions
+        .map((item, index) =>
+          '<li class="suggestion-item is-history" data-index="' + index + '" data-history="1">' +
+            HISTORY_ICON_SVG +
+            '<span class="suggestion-history-text">' + escapeHistoryHtml(item) + '</span>' +
+            '<button class="suggestion-remove" type="button" tabindex="-1" aria-label="Remove from history" data-remove="1">×</button>' +
+          '</li>'
+        )
         .join('');
 
       requestAnimationFrame(() => {
@@ -4172,8 +4336,8 @@
 
       if (!query) {
         suggestionRequestToken++;
-        hideSuggestions();
         hideQuickResult();
+        showHistorySuggestions();
         return;
       }
 
@@ -4188,6 +4352,12 @@
       debounceTimer = setTimeout(() => {
         fetchSuggestions(query);
       }, 120);
+    });
+
+    input.addEventListener('focus', () => {
+      if (currentMode !== 'search') return;
+      if (input.value.trim()) return;
+      showHistorySuggestions();
     });
 
     input.addEventListener('select', () => {
@@ -4266,6 +4436,35 @@
 
     suggestions.addEventListener('mousedown', (event) => {
       event.preventDefault();
+
+      const removeBtn = event.target.closest('.suggestion-remove');
+      if (removeBtn) {
+        const row = removeBtn.closest('.suggestion-item');
+        if (!row) return;
+        const idx = Number(row.dataset.index);
+        if (event.shiftKey) {
+          const rows = [...suggestions.querySelectorAll('.suggestion-item.is-history')];
+          rows.forEach((r) => r.classList.add('is-removing'));
+          clearSearchHistory();
+          currentSuggestions = [];
+          activeIndex = -1;
+          setTimeout(() => {
+            hideSuggestions();
+          }, 240);
+        } else {
+          row.classList.add('is-removing');
+          removeSearchHistoryAt(idx);
+          setTimeout(() => {
+            if (input.value.trim() === '' && document.activeElement === input) {
+              showHistorySuggestions();
+            } else {
+              hideSuggestions();
+            }
+          }, 240);
+        }
+        return;
+      }
+
       const item = event.target.closest('.suggestion-item');
       if (!item) return;
 
